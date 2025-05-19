@@ -1,0 +1,33 @@
+import mysql.connector
+
+db_host= "localhost"
+db_user= "root" 
+db_password= "root"
+db_name= "escuela"
+
+try:
+    conexion = mysql.connector.connect(
+    host = db_host,
+    user = db_user,
+    password = db_password,
+    database = db_name
+)
+
+    cursor = conexion.cursor()
+    consulta = "select nombre from estudiantes where materia = %s"
+    valor_materia = ('informatica',)
+
+    cursor.execute(consulta,valor_materia)
+    resultados = cursor.fetchall()
+
+    print("estudiantes de la materia matematicas:")
+    for estudiantes in resultados: 
+        print(estudiantes[0])
+    
+except mysql.connector.error as error:
+    print("error al conectar mysql: {error}")
+finally:
+    if conexion.is_connected():
+        cursor.close()
+        conexion.close()
+        print("conexion a mysql cerrada.")
