@@ -15,3 +15,17 @@ Este sitio web va ayudar a que las manicuristas gestionen sus citas de manera ma
 
 - Alineación curricular: mejor comunicación y mejor organización para la manicura y la cliente, un sistema más rápido y ágil 
 
+# Ingles
+
+##rationale
+This website will help manicurists manage their appointments manually, which causes many inconveniences such as call overload and difficulties in offering immediate availability to clients. This situation affects the business's operational efficiency and customer experience. Therefore, we will implement an appointment management website that will allow clients to book their appointments independently and at any time from home, improving their experience and satisfaction. It will also make it easier for the manicurist to organize their schedule, reducing errors and optimizing work time. Digitizing this process is essential to remain competitive in today's market.
+
+## nail appointment and design page
+
+- Purpose: To help streamline appointments and view designs to make it easier for the manicurist and the client.
+
+- Functionality: Select available dates and times using a calendar and clock, upload the chosen design, and optional prepayment.
+
+- Skills and technology: Web development in HTML or CSS.
+
+- Curriculum alignment: better communication and organization for the manicurist and the client, a faster and more streamlined system
