@@ -17,7 +17,8 @@ Este sitio web va ayudar a que las manicuristas gestionen sus citas de manera ma
 
 # Ingles
 
-##rationale
+## Rationale
+
 This website will help manicurists manage their appointments manually, which causes many inconveniences such as call overload and difficulties in offering immediate availability to clients. This situation affects the business's operational efficiency and customer experience. Therefore, we will implement an appointment management website that will allow clients to book their appointments independently and at any time from home, improving their experience and satisfaction. It will also make it easier for the manicurist to organize their schedule, reducing errors and optimizing work time. Digitizing this process is essential to remain competitive in today's market.
 
 ## nail appointment and design page
