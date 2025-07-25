@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>AgendaNails - Login</title>
+  <link rel="stylesheet" href="{{ url_for('statics', filename='ModuloL.css') }}">
+
+</head>
+<body>
+  <div class="container">
+    <img src="file:///C:/Users/ESTUDIANTE/Downloads/logo%20proa%20(1).jpeg" alt="AgendaProLogo" style="height: 40px; margin-bottom: 10px;">
+    <h2>¡Simplifica tu vida con AgendaNails!</h2>
+    <p>Utilizá nuestra plataforma para tus turnos!</p>
+
+    <form action="inicio.html" method="get">
+
+      <input type="text" placeholder="Ingresa tu nombre y apellido" required>
+      <input type="email" placeholder="Ingresa tu Email" required>
+
+      <div class="phone-group">
+        <select>
+          <option value="AR">Argentina</option>
+          <option value="CL">Chile</option>
+          <option value="CO">Colombia</option>
+          <option value="MX">México</option>
+        </select>
+        <input type="tel" placeholder="Ej: +54 9 3546-67890" required>
+      </div>
+
+      <input type="password" placeholder="Crea tu contraseña" required>
+
+  <a href="inicio.html"></a>
+      <button type="submit">Crear cuenta</button>
+
+      <a href="inicio.html">
+</a>
+    </form>
+  </div>
+</body>
+</html>
