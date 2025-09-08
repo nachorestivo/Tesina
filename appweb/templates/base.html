@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Nail Studio - Turnos de Uñas{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <header class="header">
+        <nav class="nav container">
+            <a href="{{ url_for('index') }}" class="logo">
+                <i class="fas fa-spa"></i> Nail Studio
+            </a>
+            <ul class="nav-links">
+                <li><a href="{{ url_for('index') }}">Inicio</a></li>
+                {% if session.user_id %}
+                    <li><a href="{{ url_for('catalog') }}">Catálogo</a></li>
+                    <li><a href="{{ url_for('my_appointments') }}">Mis Turnos</a></li>
+                    {% if session.is_admin %}
+                        <li><a href="{{ url_for('admin') }}">Admin</a></li>
+                    {% endif %}
+                    <li><a href="{{ url_for('logout') }}">Cerrar Sesión</a></li>
+                {% else %}
+                    <li><a href="{{ url_for('login') }}">Iniciar Sesión</a></li>
+                    <li><a href="{{ url_for('register') }}">Registrarse</a></li>
+                {% endif %}
+            </ul>
+        </nav>
+    </header>
+
+    <main class="main-content">
+        <div class="container">
+            <!-- Flash Messages -->
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    <div class="flash-messages">
+                        {% for category, message in messages %}
+                            <div class="flash-message flash-{{ category }}">
+                                {{ message }}
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            {% endwith %}
+
+            {% block content %}{% endblock %}
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2024 Nail Studio. Todos los derechos reservados.</p>
+        </div>
+    </footer>
+
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+    {% block scripts %}{% endblock %}
+</body>
+</html> 
