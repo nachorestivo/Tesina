@@ -1,107 +1,112 @@
-{% extends "base.html" %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AgendaNails - Inicio</title>
+    <link rel="stylesheet" href="Modulo.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body>
 
-{% block title %}AgendaNails - Inicio{% endblock %}
-
-{% block content %}
-<div class="hero">
-    <h1>Bienvenida a AgendaNails</h1>
-    <p>Tu belleza en manos expertas. Reserva tu turno para uñas y disfruta de un servicio profesional.</p>
-    
-    {% if session.user_id %}
-        <a href="{{ url_for('catalog') }}" class="btn btn-primary">
-            <i class="fas fa-calendar-alt"></i> Ver Catálogo
-        </a>
-    {% else %}
+    <div class="hero">
+        <h1>Bienvenida a AgendaNails</h1>
+        <p>Tu belleza en manos expertas. Reserva tu turno para uñas y disfruta de un servicio profesional.</p>
+        
         <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
-            <a href="{{ url_for('login') }}" class="btn btn-primary">
+            <a href="catalogo.html" class="btn btn-primary">
+                <i class="fas fa-calendar-alt"></i> Ver Catálogo
+            </a>
+            <a href="login.html" class="btn btn-primary">
                 <i class="fas fa-sign-in-alt"></i> Iniciar Sesión
             </a>
-            <a href="{{ url_for('register') }}" class="btn btn-secondary">
+            <a href="register.html" class="btn btn-secondary">
                 <i class="fas fa-user-plus"></i> Registrarse
             </a>
         </div>
-    {% endif %}
-</div>
+    </div>
 
-<div class="card">
-    <h2 style="text-align: center; margin-bottom: 2rem; color: #333;">
-        <i class="fas fa-star"></i> Nuestros Servicios Destacados
-    </h2>
-    
-    <div class="services-grid">
-        <div class="service-card">
-            <div class="service-image">
-                <i class="fas fa-hand-sparkles"></i>
-            </div>
-            <div class="service-content">
-                <h3 class="service-title">Manicure Básica</h3>
-                <p class="service-description">Limpieza, corte y esmaltado profesional de uñas</p>
-                <div class="service-price">$25.00</div>
-                <div class="service-duration">30 minutos</div>
-            </div>
-        </div>
+    <div class="card">
+        <h2 style="text-align: center; margin-bottom: 2rem; color: #333;">
+            <i class="fas fa-star"></i> Nuestros Servicios Destacados
+        </h2>
         
-        <div class="service-card">
-            <div class="service-image">
-                <i class="fas fa-spa"></i>
+        <div class="services-grid">
+            <div class="service-card">
+                <div class="service-image">
+                    <i class="fas fa-hand-sparkles"></i>
+                </div>
+                <div class="service-content">
+                    <h3 class="service-title">Manicure Básica</h3>
+                    <p class="service-description">Limpieza, corte y esmaltado profesional de uñas</p>
+                    <div class="service-price">$25.00</div>
+                    <div class="service-duration">30 minutos</div>
+                </div>
             </div>
-            <div class="service-content">
-                <h3 class="service-title">Pedicure Completa</h3>
-                <p class="service-description">Limpieza, corte, exfoliación y esmaltado de pies</p>
-                <div class="service-price">$35.00</div>
-                <div class="service-duration">45 minutos</div>
+            
+            <div class="service-card">
+                <div class="service-image">
+                    <i class="fas fa-spa"></i>
+                </div>
+                <div class="service-content">
+                    <h3 class="service-title">Pedicure Completa</h3>
+                    <p class="service-description">Limpieza, corte, exfoliación y esmaltado de pies</p>
+                    <div class="service-price">$35.00</div>
+                    <div class="service-duration">45 minutos</div>
+                </div>
             </div>
-        </div>
-        
-        <div class="service-card">
-            <div class="service-image">
-                <i class="fas fa-gem"></i>
+            
+            <div class="service-card">
+                <div class="service-image">
+                    <i class="fas fa-gem"></i>
+                </div>
+                <div class="service-content">
+                    <h3 class="service-title">Uñas Acrílicas</h3>
+                    <p class="service-description">Aplicación de uñas acrílicas con diseño personalizado</p>
+                    <div class="service-price">$45.00</div>
+                    <div class="service-duration">60 minutos</div>
+                </div>
             </div>
-            <div class="service-content">
-                <h3 class="service-title">Uñas Acrílicas</h3>
-                <p class="service-description">Aplicación de uñas acrílicas con diseño personalizado</p>
-                <div class="service-price">$45.00</div>
-                <div class="service-duration">60 minutos</div>
-            </div>
-        </div>
-        
-        <div class="service-card">
-            <div class="service-image">
-                <i class="fas fa-paint-brush"></i>
-            </div>
-            <div class="service-content">
-                <h3 class="service-title">Gelish</h3>
-                <p class="service-description">Esmaltado semipermanente con gel de larga duración</p>
-                <div class="service-price">$30.00</div>
-                <div class="service-duration">40 minutos</div>
+            
+            <div class="service-card">
+                <div class="service-image">
+                    <i class="fas fa-paint-brush"></i>
+                </div>
+                <div class="service-content">
+                    <h3 class="service-title">Gelish</h3>
+                    <p class="service-description">Esmaltado semipermanente con gel de larga duración</p>
+                    <div class="service-price">$30.00</div>
+                    <div class="service-duration">40 minutos</div>
+                </div>
             </div>
         </div>
     </div>
-</div>
 
-<div class="card">
-    <h2 style="text-align: center; margin-bottom: 2rem; color: #333;">
-        <i class="fas fa-info-circle"></i> ¿Por qué elegirnos?
-    </h2>
-    
-    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 2rem;">
-        <div style="text-align: center;">
-            <i class="fas fa-clock" style="font-size: 3rem; color: #667eea; margin-bottom: 1rem;"></i>
-            <h3>Horarios Flexibles</h3>
-            <p>Reserva tu turno cuando más te convenga, con horarios amplios de atención.</p>
-        </div>
+    <div class="card">
+        <h2 style="text-align: center; margin-bottom: 2rem; color: #333;">
+            <i class="fas fa-info-circle"></i> ¿Por qué elegirnos?
+        </h2>
         
-        <div style="text-align: center;">
-            <i class="fas fa-shield-alt" style="font-size: 3rem; color: #667eea; margin-bottom: 1rem;"></i>
-            <h3>Higiene Garantizada</h3>
-            <p>Utilizamos productos de alta calidad y seguimos estrictos protocolos de higiene.</p>
-        </div>
-        
-        <div style="text-align: center;">
-            <i class="fas fa-heart" style="font-size: 3rem; color: #667eea; margin-bottom: 1rem;"></i>
-            <h3>Atención Personalizada</h3>
-            <p>Cada cliente recibe atención personalizada y recomendaciones específicas.</p>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 2rem;">
+            <div style="text-align: center;">
+                <i class="fas fa-clock" style="font-size: 3rem; color: #667eea; margin-bottom: 1rem;"></i>
+                <h3>Horarios Flexibles</h3>
+                <p>Reserva tu turno cuando más te convenga, con horarios amplios de atención.</p>
+            </div>
+            
+            <div style="text-align: center;">
+                <i class="fas fa-shield-alt" style="font-size: 3rem; color: #667eea; margin-bottom: 1rem;"></i>
+                <h3>Higiene Garantizada</h3>
+                <p>Utilizamos productos de alta calidad y seguimos estrictos protocolos de higiene.</p>
+            </div>
+            
+            <div style="text-align: center;">
+                <i class="fas fa-heart" style="font-size: 3rem; color: #667eea; margin-bottom: 1rem;"></i>
+                <h3>Atención Personalizada</h3>
+                <p>Cada cliente recibe atención personalizada y recomendaciones específicas.</p>
+            </div>
         </div>
     </div>
-</div>
 
+</body>
+</html>

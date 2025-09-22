@@ -1,33 +1,44 @@
-{% extends "base.html" %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AgendaNails - Iniciar Sesión</title>
+    <link rel="stylesheet" href="ModuloL.css">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body>
 
-{% block title %}Nail Studio - Iniciar Sesión{% endblock %}
-
-{% block content %}
-<div style="max-width: 400px; margin: 0 auto;">
-    <div class="card">
-        <h2 style="text-align: center; margin-bottom: 2rem; color: #333;">
-            <i class="fas fa-sign-in-alt"></i> Iniciar Sesión
-        </h2>
-        
-        <form method="POST">
-            <div class="form-group">
-                <label for="username">Nombre de Usuario</label>
-                <input type="text" id="username" name="username" class="form-control" required>
-            </div>
-            
-            <div class="form-group">
-                <label for="password">Contraseña</label>
-                <input type="password" id="password" name="password" class="form-control" required>
-            </div>
-            
-            <button type="submit" class="btn btn-primary" style="width: 100%;">
+    <div style="max-width: 400px; margin: 0 auto;">
+        <div class="card">
+            <h2 style="text-align: center; margin-bottom: 2rem; color: #333;">
                 <i class="fas fa-sign-in-alt"></i> Iniciar Sesión
-            </button>
-        </form>
-        
-        <div style="text-align: center; margin-top: 2rem;">
-            <p>¿No tienes una cuenta? <a href="{{ url_for('register') }}" style="color: #667eea; text-decoration: none;">Regístrate aquí</a></p>
+            </h2>
+            
+            <form method="POST" action="procesar_login.html">
+                <div class="form-group">
+                    <label for="username">Nombre de Usuario</label>
+                    <input type="text" id="username" name="username" class="form-control" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="password">Contraseña</label>
+                    <input type="password" id="password" name="password" class="form-control" required>
+                </div>
+                
+                <button type="submit" class="btn btn-primary" style="width: 100%;">
+                    <i class="fas fa-sign-in-alt"></i> Iniciar Sesión
+                </button>
+            </form>
+            
+            <div style="text-align: center; margin-top: 2rem;">
+                <p>¿No tienes una cuenta? 
+                    <a href="register.html" style="color: #667eea; text-decoration: none;">Regístrate aquí</a>
+                </p>
+            </div>
         </div>
     </div>
-</div>
-{% endblock %} 
+
+</body>
+</html>
