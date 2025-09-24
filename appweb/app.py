@@ -83,8 +83,8 @@ def logout():
     return redirect(url_for('index'))
 
 
-@app.route('/catalog')
-def catalog():
+@app.route('/catalogo')
+def catalogo():
     if 'user_id' not in session:
         flash('Debes iniciar sesión para ver el catálogo', 'error')
         return redirect(url_for('login'))
@@ -92,7 +92,7 @@ def catalog():
     cur.execute("SELECT * FROM service")
     services = cur.fetchall()
     cur.close()
-    return render_template('catalog.html', services=services)
+    return render_template('catalogo.html', services=services)
 
 
 @app.route('/book_appointment/<int:service_id>', methods=['GET', 'POST'])
