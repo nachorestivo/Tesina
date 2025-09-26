@@ -3,21 +3,21 @@ from flask import Flask, render_template, request, redirect, url_for, flash, ses
 from flask_mysqldb import MySQL
 from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime, timedelta
-import MySQLdb
-import os
+# import MySQLdb
+# import os
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = 'tu_clave_secreta_aqui'
+app.config['SECRET_KEY'] = 'b1f8e7c9-4a2e-4d8b-9f3c-2e7a6c1d8e5f' 
 app.config['MYSQL_HOST'] = 'localhost'
 app.config['MYSQL_USER'] = 'root'
 app.config['MYSQL_PASSWORD'] = 'admin123'
 app.config['MYSQL_DB'] = 'agendanails'
-app.config['Port'] = 3307
+app.config['MYSQL_PORT'] = 3307
 
 mysql = MySQL(app)
 
 def get_cursor():
-    return mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+   return mysql.connection.cursor()
 
 # Rutas principales
 @app.route('/')
@@ -31,13 +31,13 @@ def login():
         username = request.form['username']
         password = request.form['password']
         cur = get_cursor()
-        cur.execute("SELECT * FROM user WHERE username = %s", (username,))
-        user = cur.fetchone()
+        cur.execute("SELECT * FROM usuarios WHERE username = %s", (username,))
+        usuarios = cur.fetchone()
         cur.close()
-        if user and check_password_hash(user['password_hash'], password):
-            session['user_id'] = user['id']
-            session['username'] = user['username']
-            session['is_admin'] = user['is_admin']
+        if usuarios and check_password_hash(usuarios['password_hash'], password):
+            session['user_id'] = usuarios['id']
+            session['username'] = usuarios['username']
+            session['is_admin'] = usuarios['is_admin']
             flash('¡Inicio de sesión exitoso!', 'success')
             return redirect(url_for('catalog'))
         else:
@@ -56,19 +56,19 @@ def register():
             flash('Las contraseñas no coinciden', 'error')
             return render_template('register.html')
         cur = get_cursor()
-        cur.execute("SELECT * FROM user WHERE username = %s", (username,))
+        cur.execute("SELECT * FROM usuarios WHERE username = %s", (username,))
         if cur.fetchone():
             flash('El nombre de usuario ya existe', 'error')
             cur.close()
             return render_template('register.html')
-        cur.execute("SELECT * FROM user WHERE email = %s", (email,))
+        cur.execute("SELECT * FROM usuarios WHERE email = %s", (email,))
         if cur.fetchone():
             flash('El email ya está registrado', 'error')
             cur.close()
             return render_template('register.html')
         password_hash = generate_password_hash(password)
-        cur.execute("INSERT INTO user (username, email, password_hash, is_admin, created_at) VALUES (%s, %s, %s, %s, %s)",
-                    (username, email, password_hash, False, datetime.now()))
+        cur.execute("INSERT INTO usuarios (username, email, password, is_admin, created_at) VALUES (%s, %s, %s, %s, %s)",
+                    (username, email, password, False, datetime.now()))
         mysql.connection.commit()
         cur.close()
         flash('¡Registro exitoso! Ahora puedes iniciar sesión', 'success')
@@ -232,9 +232,9 @@ def create_sample_data():
         cur.execute("SELECT * FROM service WHERE name = %s", (s[0],))
         if not cur.fetchone():
             cur.execute("INSERT INTO service (name, description, price, duration, image_url) VALUES (%s, %s, %s, %s, %s)", s)
-    cur.execute("SELECT * FROM user WHERE username = 'admin'")
+    cur.execute("SELECT * FROM usuarios WHERE username = 'admin'")
     if not cur.fetchone():
-        cur.execute("INSERT INTO user (username, email, password_hash, is_admin, created_at) VALUES (%s, %s, %s, %s, %s)",
+        cur.execute("INSERT INTO usuarios (username, email, password_hash, is_admin, created_at) VALUES (%s, %s, %s, %s, %s)",
                     ('admin', 'admin@nailstudio.com', generate_password_hash('admin123'), True, datetime.now()))
     mysql.connection.commit()
     cur.close()
