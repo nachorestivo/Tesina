@@ -34,12 +34,12 @@ def login():
         cur.execute("SELECT * FROM usuarios WHERE username = %s", (username,))
         usuarios = cur.fetchone()
         cur.close()
-        if usuarios and check_password_hash(usuarios['password_hash'], password):
+        if usuarios and check_password_hash(usuarios['password'], password):
             session['user_id'] = usuarios['id']
             session['username'] = usuarios['username']
             session['is_admin'] = usuarios['is_admin']
             flash('¡Inicio de sesión exitoso!', 'success')
-            return redirect(url_for('catalog'))
+            return redirect(url_for('catalogo'))
         else:
             flash('Usuario o contraseña incorrectos', 'error')
     return render_template('login.html')
