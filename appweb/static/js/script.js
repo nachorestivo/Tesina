@@ -154,6 +154,6 @@ document.addEventListener('DOMContentLoaded', function() {
 if (window.location.pathname === '/admin') {
     setInterval(() => {
         // Refresh the page every 5 minutes
-        window.location.reload();
+        // window.location.reload();
     }, 300000);
 } 

@@ -16,8 +16,8 @@ app.config['MYSQL_PORT'] = 3307
 
 mysql = MySQL(app)
 
-def get_cursor():
-   return mysql.connection.cursor()
+def get_cursor(dictionary=False):
+     return mysql.connection.cursor(MySQLdb.cursors.DictCursor) if dictionary else mysql.connection.cursor()
 
 # Rutas principales
 @app.route('/')
@@ -34,7 +34,7 @@ def login():
         cur.execute("SELECT * FROM usuarios WHERE username = %s", (username,))
         usuarios = cur.fetchone()
         cur.close()
-        if usuarios and check_password_hash(usuarios['password'], password):
+        if usuarios and check_password_hash(usuarios[2], password):
             session['user_id'] = usuarios['id']
             session['username'] = usuarios['username']
             session['is_admin'] = usuarios['is_admin']
