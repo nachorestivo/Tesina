@@ -39,7 +39,7 @@ def login():
             session['username'] = usuarios['username']
             session['is_admin'] = usuarios['is_admin']
             flash('¡Inicio de sesión exitoso!', 'success')
-            return redirect(url_for('index'))
+            return render_template('index.html')
         else:
             flash('Usuario o contraseña incorrectos', 'error')
     return render_template('login.html')
