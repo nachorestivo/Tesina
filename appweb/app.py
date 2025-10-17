@@ -3,7 +3,7 @@ from flask import Flask, render_template, request, redirect, url_for, flash, ses
 from flask_mysqldb import MySQL
 from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime, timedelta
-# import MySQLdb
+import MySQLdb
 # import os
 
 app = Flask(__name__)
@@ -17,7 +17,7 @@ app.config['MYSQL_PORT'] = 3307
 mysql = MySQL(app)
 
 def get_cursor(dictionary=False):
-     return mysql.connection.cursor(MySQLdb.cursors.DictCursor) if dictionary else mysql.connection.cursor()
+    return mysql.connection.cursor(MySQLdb.cursors.DictCursor) if dictionary else mysql.connection.cursor()
 
 # Rutas principales
 @app.route('/')
@@ -30,11 +30,11 @@ def login():
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
-        cur = get_cursor()
+        cur = get_cursor(dictionary=True)
         cur.execute("SELECT * FROM usuarios WHERE username = %s", (username,))
         usuarios = cur.fetchone()
         cur.close()
-        if usuarios and check_password_hash(usuarios[2], password):
+        if usuarios and check_password_hash(usuarios['password'], password):
             session['user_id'] = usuarios['id']
             session['username'] = usuarios['username']
             session['is_admin'] = usuarios['is_admin']
@@ -70,7 +70,8 @@ def register():
         cur.execute("INSERT INTO usuarios (username, email, password, is_admin, created_at) VALUES (%s, %s, %s, %s, %s)",
                     (username, email, password, False, datetime.now()))
         mysql.connection.commit()
-        cur.close()
+        cur.execute("INSERT INTO usuarios (username, email, password, is_admin, created_at) VALUES (%s, %s, %s, %s, %s)",
+            (username, email, password_hash, False, datetime.now())) 
         flash('¡Registro exitoso! Ahora puedes iniciar sesión', 'success')
         return redirect(url_for('login'))
     return render_template('register.html')
