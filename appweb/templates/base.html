@@ -16,7 +16,7 @@
             <ul class="nav-links">
                 <li><a href="{{ url_for('index') }}">Inicio</a></li>
                 {% if session.user_id %}
-                    <li><a href="{{ url_for('catalog') }}">Catálogo</a></li>
+                    <li><a href="{{ url_for('catalogo') }}">Catálogo</a></li>
                     <li><a href="{{ url_for('my_appointments') }}">Mis Turnos</a></li>
                     {% if session.is_admin %}
                         <li><a href="{{ url_for('admin') }}">Admin</a></li>
@@ -58,4 +58,4 @@
     <script src="{{ url_for('static', filename='js/script.js') }}"></script>
     {% block scripts %}{% endblock %}
 </body>
-</html> 
+</html>

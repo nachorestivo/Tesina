@@ -33,14 +33,54 @@
     </div>
     
     <!-- Acciones de administrador -->
-    <div style="margin-bottom: 2rem;">
+    <div style="margin-bottom: 2rem; display: flex; gap: 1rem;">
         <a href="{{ url_for('add_service') }}" class="btn btn-primary">
             <i class="fas fa-plus"></i> Agregar Servicio
         </a>
     </div>
     
-    <!-- Lista de turnos -->
+    <!-- Lista de servicios -->
     <h3 style="margin-bottom: 1rem; color: #333;">
+        <i class="fas fa-th-list"></i> Servicios Disponibles
+    </h3>
+    
+    {% if services %}
+        <table class="appointments-table">
+            <thead>
+                <tr>
+                    <th>Servicio</th>
+                    <th>Descripción</th>
+                    <th>Precio</th>
+                    <th>Duración</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for service in services %}
+                    <tr>
+                        <td><strong>{{ service.name }}</strong></td>
+                        <td>{{ service.description }}</td>
+                        <td>${{ "%.2f"|format(service.price) }}</td>
+                        <td>{{ service.duration }} min</td>
+                        <td>
+                            <a href="{{ url_for('edit_service', service_id=service.id) }}" 
+                               class="btn btn-warning btn-sm">
+                                <i class="fas fa-edit"></i> Editar
+                            </a>
+                            <a href="{{ url_for('delete_service', service_id=service.id) }}" 
+                               class="btn btn-danger btn-sm"
+                               onclick="return confirm('¿Estás seguro de eliminar este servicio?')">
+                                <i class="fas fa-trash"></i> Eliminar
+                            </a>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% endif %}
+    
+    <!-- Lista de turnos -->
+    <h3 style="margin: 2rem 0 1rem; color: #333;">
         <i class="fas fa-calendar-alt"></i> Todos los Turnos
     </h3>
     
@@ -60,12 +100,11 @@
                 {% for appointment in appointments %}
                     <tr>
                         <td>
-                            <strong>{{ appointment.user.username }}</strong><br>
-                            <small>{{ appointment.user.email }}</small>
+                            <strong>{{ appointment.user_name }}</strong><br>
+                            <small>{{ appointment.email }}</small>
                         </td>
                         <td>
-                            <strong>{{ appointment.service.name }}</strong><br>
-                            <small>{{ appointment.service.description }}</small>
+                            <strong>{{ appointment.service_name }}</strong>
                         </td>
                         <td>
                             {{ appointment.appointment_date.strftime('%d/%m/%Y') }}<br>
@@ -84,7 +123,7 @@
                                 {% endif %}
                             </span>
                         </td>
-                        <td>${{ "%.2f"|format(appointment.service.price) }}</td>
+                        <td>${{ "%.2f"|format(appointment.price) }}</td>
                         <td>
                             {% if appointment.status == 'pending' %}
                                 <a href="{{ url_for('confirm_appointment', appointment_id=appointment.id) }}" 
@@ -112,4 +151,3 @@
         </div>
     {% endif %}
 </div>
-{% endblock %} 
