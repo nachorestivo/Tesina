@@ -1,42 +1,292 @@
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Agenda</title>
-<link rel="stylesheet" href="{{ url_for('static', filename='Modulo.css') }}">
-
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Catálogo de Turnos - Nails Studio</title>
+   <link rel="stylesheet" href="{{ url_for('static', filename='catalogo.css') }}">
 </head>
 <body>
 
-
-  <div class="top-bar">
-  
-  </div>
-
-
-  <header class="header">
-    <div class="logo">AGENDANAILS</div>
-    <nav>
-      <a href="#">Servicios</a>
-      <a href="#">Turnos</a>
-      <a href="#">Beneficios</a>
-      <a href="#">Empleados</a>
-    </nav>
+  <header>
+    <h1>Agenda Nails - Catálogo de Turnos</h1>
+    <button class="volver-inicio" onclick="window.location.href= index.html">Volver al inicio</button>
   </header>
 
-
-  <section class="hero">
-    <div class="content">
-      <h1>NEW BODY MIST COLLECTION</h1>
-      <p>Passion Fruit · Praline Flower · Peach Rose · Pitanga Glow</p>
-    </div>
-  </section>
-
-  <div class="promo-strip">
-  20% OFF + ENVÍO GRATIS
+  <!-- Botón para entrar al modo administrador -->
+  <div class="admin-access">
+    <button id="btn-admin">Modo Administrador</button>
   </div>
 
+  <!-- Sección visible para el usuario -->
+  <section id="usuario">
+    <!-- Catálogo de servicios -->
+    <div class="catalogo">
+      <!-- 12 servicios sin imágenes -->
+      <div class="card" data-nombre="Manicura Clásica" data-precio="2500">
+        <h3>Manicura Clásica</h3>
+        <p>Limpieza, limado y esmaltado tradicional.</p>
+        <p>Duración 5min</p>
+        <span class="precio">$2500</span>
+        <button class="btn-agregar">Agregar</button>
+      </div>
+
+      <div class="card" data-nombre="Manicura Francesa" data-precio="2800">
+        <h3>Manicura Francesa</h3>
+        <p>Diseño natural con puntas blancas elegantes.</p>
+        <p>Duración 5min</p>
+        <span class="precio">$2800</span>
+        <button class="btn-agregar">Agregar</button>
+      </div>
+
+      <div class="card" data-nombre="Esmaltado Semipermanente" data-precio="3500">
+        <h3>Esmaltado Semipermanente</h3>
+        <p>Duración hasta 15 días, brillo intenso.</p>
+        <p>Duración 5min</p>
+        <span class="precio">$3500</span>
+        <button class="btn-agregar">Agregar</button>
+      </div>
+
+      <div class="card" data-nombre="Nail Art Básico" data-precio="3000">
+        <h3>Nail Art Básico</h3>
+        <p>Diseños simples y delicados por uña.</p>
+        <p>Duración 5min</p>
+        <span class="precio">$3000</span>
+        <button class="btn-agregar">Agregar</button>
+      </div>
+
+      <div class="card" data-nombre="Nail Art Avanzado" data-precio="4500">
+        <h3>Nail Art Avanzado</h3>
+        <p>Diseños personalizados con decoraciones.</p>
+        <p>Duración 5min</p>
+        <span class="precio">$4500</span>
+        <button class="btn-agregar">Agregar</button>
+      </div>
+
+      <div class="card" data-nombre="Uñas Esculpidas" data-precio="6000">
+        <h3>Uñas Esculpidas</h3>
+        <p>Modelado profesional con acrílico o gel.</p>
+        <p>Duración 5min</p>
+        <span class="precio">$6000</span>
+        <button class="btn-agregar">Agregar</button>
+      </div>
+
+      <div class="card" data-nombre="Mantenimiento de Uñas" data-precio="2800">
+        <h3>Mantenimiento de Uñas</h3>
+        <p>Retoque y reparación de esculpidas.</p>
+        <span class="precio">$2800</span>
+        <button class="btn-agregar">Agregar</button>
+      </div>
+
+      <div class="card" data-nombre="Spa de Manos" data-precio="3200">
+        <h3>Spa de Manos</h3>
+        <p>Exfoliación, masaje y tratamiento hidratante.</p>
+        <span class="precio">$3200</span>
+        <button class="btn-agregar">Agregar</button>
+      </div>
+
+      <div class="card" data-nombre="Baño de Parafina" data-precio="2500">
+        <h3>Baño de Parafina</h3>
+        <p>Suaviza la piel y mejora la circulación.</p>
+        <span class="precio">$2500</span>
+        <button class="btn-agregar">Agregar</button>
+      </div>
+
+      <div class="card" data-nombre="Decoración con Piedras" data-precio="3700">
+        <h3>Decoración con Piedras</h3>
+        <p>Brillo y glamour con diseños personalizados.</p>
+        <span class="precio">$3700</span>
+        <button class="btn-agregar">Agregar</button>
+      </div>
+
+      <div class="card" data-nombre="Esmaltado Permanente" data-precio="3800">
+        <h3>Esmaltado Permanente</h3>
+        <p>Alta duración con acabado profesional.</p>
+        <span class="precio">$3800</span>
+        <button class="btn-agregar">Agregar</button>
+      </div>
+
+      <div class="card" data-nombre="Reparación de Uña" data-precio="1500">
+        <h3>Reparación de Uña</h3>
+        <p>Arreglo de uñas quebradas o dañadas.</p>
+        <span class="precio">$1500</span>
+        <button class="btn-agregar">Agregar</button>
+      </div>
+    </div>
+
+    <!-- Carrito -->
+    <aside class="carrito">
+      <h2>Tu selección</h2>
+      <ul id="lista-carrito"></ul>
+      <p id="total">Total: $0</p>
+
+      <input type="text" id="nombre" placeholder="Tu nombre completo">
+      <input type="date" id="fecha">
+      <select id="horario">
+        <option value="">Selecciona horario</option>
+      </select>
+
+      <button id="btn-agendar">Agendar turno</button>
+    </aside>
+  </section>
+
+  <!-- Modal -->
+  <div id="modal" class="modal oculto">
+    <div class="modal-contenido">
+      <h3>¡Turno agendado con éxito!</h3>
+      <p>Gracias por elegirnos 💅</p>
+    </div>
+  </div>
+
+  <!-- Panel del administrador -->
+  <section id="admin" class="oculto">
+    <button class="cerrar-admin">Cerrar panel</button>
+    <h2>Panel del Administrador</h2>
+
+    <!-- Form para cargar horarios -->
+    <form class="admin-form" id="form-horario">
+      <h3>Agregar horario disponible:</h3>
+      <input type="time" id="nuevo-horario" required>
+      <button type="submit" id="btn-agregar-horario">Agregar horario</button>
+      <ul id="lista-horarios"></ul>
+    </form>
+
+    <!-- Tabla de turnos -->
+    <h3>Turnos agendados:</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>Cliente</th>
+          <th>Servicios</th>
+          <th>Fecha</th>
+          <th>Horario</th>
+          <th>Total</th>
+        </tr>
+      </thead>
+      <tbody id="tabla-turnos"></tbody>
+    </table>
+  </section>
+
+  <script>
+    // --- Variables principales ---
+    const botonesAgregar = document.querySelectorAll('.btn-agregar');
+    const listaCarrito = document.getElementById('lista-carrito');
+    const totalElemento = document.getElementById('total');
+    const btnAgendar = document.getElementById('btn-agendar');
+    const modal = document.getElementById('modal');
+    const fechaInput = document.getElementById('fecha');
+    const horarioSelect = document.getElementById('horario');
+    const adminPanel = document.getElementById('admin');
+    const btnAdmin = document.getElementById('btn-admin');
+    const cerrarAdmin = document.querySelector('.cerrar-admin');
+    const tablaTurnos = document.getElementById('tabla-turnos');
+    const formHorario = document.getElementById('form-horario');
+    const listaHorarios = document.getElementById('lista-horarios');
+    const nuevoHorario = document.getElementById('nuevo-horario');
+
+    let carrito = [];
+    let horariosDisponibles = [];
+    let turnosAgendados = [];
+
+    // --- Deshabilitar fechas anteriores ---
+    const hoy = new Date().toISOString().split('T')[0];
+    fechaInput.setAttribute('min', hoy);
+
+    // --- Agregar servicio al carrito ---
+    botonesAgregar.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const card = btn.closest('.card');
+        const nombre = card.dataset.nombre;
+        const precio = parseFloat(card.dataset.precio);
+        carrito.push({ nombre, precio });
+        actualizarCarrito();
+      });
+    });
+
+    function actualizarCarrito() {
+      listaCarrito.innerHTML = '';
+      let total = 0;
+      carrito.forEach(item => {
+        const li = document.createElement('li');
+        li.textContent = `${item.nombre} - $${item.precio}`;
+        listaCarrito.appendChild(li);
+        total += item.precio;
+      });
+      totalElemento.textContent = `Total: $${total}`;
+    }
+
+    // --- Agendar turno ---
+    btnAgendar.addEventListener('click', () => {
+      const nombre = document.getElementById('nombre').value.trim();
+      const fecha = fechaInput.value;
+      const horario = horarioSelect.value;
+      if (!nombre || !fecha || !horario || carrito.length === 0) {
+        alert('Completa todos los campos antes de agendar.');
+        return;
+      }
+      const total = carrito.reduce((s, i) => s + i.precio, 0);
+      const servicios = carrito.map(i => i.nombre).join(', ');
+      const turno = { nombre, servicios, fecha, horario, total };
+      turnosAgendados.push(turno);
+      agregarTurnoATabla(turno);
+      carrito = [];
+      actualizarCarrito();
+      modal.classList.remove('oculto');
+      setTimeout(() => modal.classList.add('oculto'), 2500);
+    });
+
+    function agregarTurnoATabla(turno) {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td data-label="Cliente">${turno.nombre}</td>
+        <td data-label="Servicios">${turno.servicios}</td>
+        <td data-label="Fecha">${turno.fecha}</td>
+        <td data-label="Horario">${turno.horario}</td>
+        <td data-label="Total">$${turno.total}</td>
+      `;
+      tablaTurnos.appendChild(tr);
+    }
+
+    // --- Acceso administrador con contraseña ---
+    btnAdmin.addEventListener('click', () => {
+      const pass = prompt("Ingrese la contraseña de administrador:");
+      if (pass === "admin123") {
+        adminPanel.classList.remove('oculto');
+        window.scrollTo({ top: adminPanel.offsetTop, behavior: 'smooth' });
+      } else if (pass !== null) {
+        alert("Contraseña incorrecta.");
+      }
+    });
+
+    cerrarAdmin.addEventListener('click', () => {
+      adminPanel.classList.add('oculto');
+    });
+
+    // --- Administración de horarios ---
+    formHorario.addEventListener('submit', e => {
+      e.preventDefault();
+      const hora = nuevoHorario.value;
+      if (hora && !horariosDisponibles.includes(hora)) {
+        horariosDisponibles.push(hora);
+        actualizarHorarios();
+        nuevoHorario.value = '';
+      }
+    });
+
+    function actualizarHorarios() {
+      listaHorarios.innerHTML = '';
+      horarioSelect.innerHTML = '<option value="">Selecciona horario</option>';
+      horariosDisponibles.forEach(hora => {
+        const li = document.createElement('li');
+        li.textContent = hora;
+        listaHorarios.appendChild(li);
+
+        const opt = document.createElement('option');
+        opt.value = hora;
+        opt.textContent = hora;
+        horarioSelect.appendChild(opt);
+      });
+    }
+  </script>
 </body>
 </html>
