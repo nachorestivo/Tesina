@@ -5,22 +5,23 @@ body {
   padding: 0;
   color: #333;
 }
- .volver-inicio {
-      position: absolute;
-      top: 20px;
-      right: 20px;
-      background-color: #f9c5d1;
-      color: #333;
-      border: none;
-      padding: 8px 16px;
-      border-radius: 8px;
-      cursor: pointer;
-      font-weight: bold;
-      transition: background 0.3s ease;
-    }
-    .volver-inicio:hover {
-      background-color: #f6a5b4;
-    }
+
+.volver-inicio {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  background-color: #f9c5d1;
+  color: #333;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background 0.3s ease;
+}
+.volver-inicio:hover {
+  background-color: #f6a5b4;
+}
 
 header {
   background: linear-gradient(to right, #f8a9c4, #fddde6);
@@ -30,43 +31,39 @@ header {
   box-shadow: 0 2px 8px rgba(0,0,0,0.1);
 }
 
-
 h1, h2 {
   text-align: center;
   color: #b93a7c;
 }
 
-
+/* --- Catálogo de servicios --- */
 .catalogo {
   display: flex;
   justify-content: center;
   flex-wrap: wrap;
-  gap: 1.5rem;
-  padding: 1rem;
+  gap: 2rem;
+  padding: 2rem;
 }
-
 
 .card {
   background-color: #fff;
   border-radius: 15px;
   box-shadow: 0 3px 8px rgba(0,0,0,0.1);
-  width: 280px;
+  width: 350px;           /* Más ancha */
+  min-height: 260px;      /* Más alta */
   text-align: center;
-  padding: 1rem;
+  padding: 1.5rem;
   transition: transform 0.3s;
 }
-
 
 .card:hover {
   transform: scale(1.05);
 }
 
-
 .card img {
-  width: 100px;
-  height: 100px;
+  width: 120px;
+  height: 120px;
 }
-
 
 .precio {
   display: block;
@@ -75,33 +72,30 @@ h1, h2 {
   color: #b93a7c;
 }
 
-
 .btn-agregar {
   background-color: #f8a9c4;
   border: none;
-  padding: 0.5rem 1rem;
+  padding: 0.6rem 1.3rem;
   border-radius: 8px;
   color: white;
   cursor: pointer;
   transition: background 0.3s;
 }
 
-
 .btn-agregar:hover {
   background-color: #b93a7c;
 }
 
-
+/* --- Cuadro de selección --- */
 .carrito {
   background-color: #ffeaf3;
-  margin: 2rem auto;
-  padding: 1rem;
+  margin: 3rem auto 2rem auto;
+  padding: 1.5rem;
   max-width: 400px;
   border-radius: 15px;
   text-align: center;
   box-shadow: 0 3px 8px rgba(0,0,0,0.1);
 }
-
 
 .carrito input {
   display: block;
@@ -111,7 +105,6 @@ h1, h2 {
   border: 1px solid #f8a9c4;
   border-radius: 8px;
 }
-
 
 #btn-agendar {
   background-color: #b93a7c;
@@ -123,11 +116,16 @@ h1, h2 {
   margin-top: 1rem;
 }
 
-
 #btn-agendar:hover {
   background-color: #8a275b;
 }
 
+/* --- Alinear carrito abajo --- */
+.contenedor-principal {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
 
 /* Modal */
 .modal {
@@ -142,11 +140,9 @@ h1, h2 {
   justify-content: center;
 }
 
-
 .oculto {
   display: none;
 }
-
 
 .modal-contenido {
   background-color: #fff;
@@ -157,13 +153,11 @@ h1, h2 {
   box-shadow: 0 5px 15px rgba(0,0,0,0.3);
 }
 
-
 /* ADMIN */
 .admin-access {
   text-align: center;
   margin: 2rem 0;
 }
-
 
 #btn-admin {
   background-color: #b93a7c;
@@ -174,17 +168,14 @@ h1, h2 {
   cursor: pointer;
 }
 
-
 #btn-admin:hover {
   background-color: #8a275b;
 }
-
 
 #admin {
   margin: 3rem auto;
   max-width: 800px;
 }
-
 
 .cerrar-admin {
   background-color: #f8a9c4;
@@ -196,7 +187,6 @@ h1, h2 {
   cursor: pointer;
 }
 
-
 table {
   width: 100%;
   border-collapse: collapse;
@@ -205,30 +195,25 @@ table {
   overflow: hidden;
 }
 
-
 th, td {
   padding: 1rem;
   text-align: center;
   border-bottom: 1px solid #ffe6f0;
 }
 
-
 th {
   background-color: #f8a9c4;
   color: white;
 }
 
-
+/* Responsive */
 @media (max-width: 600px) {
   .catalogo {
     flex-direction: column;
     align-items: center;
   }
 
-
   .card {
     width: 90%;
   }
 }
-
-

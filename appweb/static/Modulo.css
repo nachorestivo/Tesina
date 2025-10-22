@@ -17,7 +17,7 @@ body {
 .hero {
     text-align: center;
     padding: 4rem 2rem;
-    background: linear-gradient(135deg, #667eea, #764ba2);
+    background: linear-gradient(135deg, #667eea, #dba5d1);
     color: #fff;
 }
 
@@ -42,22 +42,22 @@ body {
 }
 
 .btn-primary {
-    background-color: #667eea;
+    background-color: #dba5d1;
     color: #fff;
 }
 
 .btn-primary:hover {
-    background-color: #5a67d8;
+    background-color: #dba5d1;
     transform: translateY(-2px);
 }
 
 .btn-secondary {
-    background-color: #764ba2;
+    background-color: #dba5d1;
     color: #fff;
 }
 
 .btn-secondary:hover {
-    background-color: #6b4f9f;
+    background-color: #dba5d1;
     transform: translateY(-2px);
 }
 
@@ -93,7 +93,7 @@ body {
 
 .service-image {
     font-size: 3rem;
-    color: #667eea;
+    color: #dba5d1;
     margin-bottom: 1rem;
 }
 
@@ -112,7 +112,7 @@ body {
 .service-price {
     font-size: 1.1rem;
     font-weight: bold;
-    color: #764ba2;
+    color: #dba5d1;
     margin-top: 0.5rem;
 }
 
