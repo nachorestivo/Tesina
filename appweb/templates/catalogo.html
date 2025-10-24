@@ -228,6 +228,14 @@
         horarioSelect.appendChild(opt);
       });
     }
+    
+  // Cuando confirmes/agendes un turno, guarda los datos en localStorage
+  function guardarTurno(servicio, fecha, hora) {
+    const turnos = JSON.parse(localStorage.getItem('turnos')) || [];
+    turnos.push({ servicio, fecha, hora });
+    localStorage.setItem('turnos', JSON.stringify(turnos));
+    alert("Turno agendado correctamente");
+  }
   </script>
 </body>
 </html>

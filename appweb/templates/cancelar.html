@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cancelar Turno - Nails Studio</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='cancelar.html.css') }}">
+</head>
+<body>
+  <div class="container">
+    <h1>Cancelar Turno</h1>
+    <p>Selecciona el turno que deseas cancelar</p>
+
+    <div id="turnos-lista" class="turnos-lista">
+      <!-- Los turnos se mostrarán aquí -->
+    </div>
+
+    <button class="volver-inicio" onclick="window.location.href='/'">Volver al inicio</button>
+  </div>
+
+  <script>
+    // Cargar turnos guardados
+    const turnos = JSON.parse(localStorage.getItem('turnos')) || [];
+    const lista = document.getElementById('turnos-lista');
+
+    if (turnos.length === 0) {
+      lista.innerHTML = "<p>No tienes turnos agendados.</p>";
+    } else {
+      turnos.forEach((turno, index) => {
+        const div = document.createElement('div');
+        div.className = 'turno';
+        div.innerHTML = `
+          <p><strong>Servicio:</strong> ${turno.servicio}</p>
+          <p><strong>Fecha:</strong> ${turno.fecha}</p>
+          <p><strong>Hora:</strong> ${turno.hora}</p>
+          <button class="btn-cancelar" onclick="cancelarTurno(${index})">Cancelar</button>
+        `;
+        lista.appendChild(div);
+      });
+    }
+
+    function cancelarTurno(i) {
+      if (confirm("¿Seguro que quieres cancelar este turno?")) {
+        turnos.splice(i, 1);
+        localStorage.setItem('turnos', JSON.stringify(turnos));
+        location.reload();
+      }
+    }
+  </script>
+</body>
+</html>
