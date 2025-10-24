@@ -217,3 +217,30 @@ th {
     width: 90%;
   }
 }
+/* seccion cancelar turno */
+.button-container {
+  margin-top: 30px;
+}
+
+.btn {
+  display: inline-block;
+  background-color: #ff66b2;
+  color: white;
+  padding: 0.7rem 1.5rem;
+  margin: 10px;
+  border-radius: 10px;
+  text-decoration: none;
+  transition: 0.3s;
+}
+
+.btn:hover {
+  background-color: #ff1a8c;
+}
+
+.cancel {
+  background-color: #b84dff;
+}
+
+.cancel:hover {
+  background-color: #9933cc;
+}
