@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mis Turnos - Nails Studio</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f5f5f5;
+      margin: 0;
+      padding: 0;
+    }
+    header {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 20px;
+      text-align: center;
+    }
+    header h1 {
+      margin: 0 0 10px 0;
+    }
+    header a {
+      color: white;
+      text-decoration: none;
+      margin: 0 10px;
+      padding: 8px 16px;
+      background: rgba(255,255,255,0.2);
+      border-radius: 5px;
+      display: inline-block;
+    }
+    header a:hover {
+      background: rgba(255,255,255,0.3);
+    }
+    .turnos-container {
+      max-width: 1200px;
+      margin: 20px auto;
+      padding: 20px;
+    }
+    .turno-card {
+      background: white;
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 15px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    .turno-card h3 {
+      margin-top: 0;
+      color: #333;
+    }
+    .estado {
+      display: inline-block;
+      padding: 5px 10px;
+      border-radius: 5px;
+      font-weight: bold;
+      font-size: 14px;
+      margin-left: 10px;
+    }
+    .estado.pendiente {
+      background: #ffc107;
+      color: #000;
+    }
+    .estado.confirmado {
+      background: #28a745;
+      color: white;
+    }
+    .estado.cancelado {
+      background: #dc3545;
+      color: white;
+    }
+    .estado.completado {
+      background: #17a2b8;
+      color: white;
+    }
+    .acciones {
+      margin-top: 15px;
+    }
+    .btn-cancelar {
+      background: #dc3545;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+    .btn-cancelar:hover {
+      background: #c82333;
+    }
+    .no-turnos {
+      text-align: center;
+      padding: 40px;
+      background: white;
+      border-radius: 8px;
+    }
+    .no-turnos a {
+      color: #667eea;
+      text-decoration: none;
+      font-weight: bold;
+    }
+    .alert {
+      padding: 15px;
+      margin-bottom: 20px;
+      border-radius: 5px;
+    }
+    .alert-error {
+      background: #f8d7da;
+      color: #721c24;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Mis Turnos</h1>
+    <div>
+      <a href="{{ url_for('catalogo') }}">Volver al Catálogo</a>
+      <a href="{{ url_for('index') }}">Inicio</a>
+      <a href="{{ url_for('logout') }}">Cerrar Sesión</a>
+    </div>
+  </header>
+
+  <div class="turnos-container">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="alert alert-{{ category }}">
+            {{ message }}
+          </div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
+    <h2>Mis Turnos Agendados</h2>
+    
+    {% if turnos %}
+      {% for turno in turnos %}
+      <div class="turno-card">
+        <h3>{{ turno.Servicios }}</h3>
+        <p><strong>Fecha:</strong> {{ turno.fecha if turno.fecha else 'No especificada' }}</p>
+        <p><strong>Hora:</strong> {{ turno.hora if turno.hora else 'No especificada' }}</p>
+        <p><strong>Total:</strong> ${{ "{:,.0f}".format(turno.Total) if turno.Total else '0' }}</p>
+        <p>
+          <strong>Estado:</strong> 
+          <span class="estado {{ turno.Estado_del_turno.lower() if turno.Estado_del_turno else 'pendiente' }}">
+            {{ turno.Estado_del_turno.title() if turno.Estado_del_turno else 'Pendiente' }}
+          </span>
+        </p>
+        
+        {% if turno.Estado_del_turno not in ['cancelado', 'completado'] %}
+        <div class="acciones">
+          <button class="btn-cancelar" onclick="cancelarTurno({{ turno.id_Turnos }})">
+            Cancelar Turno
+          </button>
+        </div>
+        {% endif %}
+      </div>
+      {% endfor %}
+    {% else %}
+      <div class="no-turnos">
+        <p>No tienes turnos agendados.</p>
+        <p><a href="{{ url_for('catalogo') }}">Haz clic aquí para agendar tu primer turno</a></p>
+      </div>
+    {% endif %}
+  </div>
+
+  <script>
+    async function cancelarTurno(turnoId) {
+      if (!confirm('¿Estás seguro de que deseas cancelar este turno?')) {
+        return;
+      }
+
+      try {
+        const response = await fetch(`/cancelar_turno/${turnoId}`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          }
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+          alert('Turno cancelado exitosamente');
+          location.reload();
+        } else {
+          alert(data.message || 'Error al cancelar el turno');
+        }
+      } catch (error) {
+        console.error('Error:', error);
+        alert('Error de conexión. Por favor intenta nuevamente.');
+      }
+    }
+  </script>
+</body>
+</html>

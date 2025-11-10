@@ -1,29 +1,31 @@
-from flask import Flask, render_template, request, redirect, url_for, flash, session
+from flask import Flask, render_template, request, redirect, url_for, flash, session, jsonify
 from flask_mysqldb import MySQL
 from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime, timedelta
+import json
 
 try:
     import MySQLdb.cursors
 except ImportError:
-    print("Advertencia: No se encontró 'MySQLdb.cursors'. Asegúrate de que tu instalación de flask-mysqldb es correcta.")
+    print("Advertencia: No se encontró 'MySQLdb.cursors'.")
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'b1f8e7c9-4a2e-4d8b-9f3c-2e7a6c1d8e5f' 
 app.config['MYSQL_HOST'] = 'localhost'
 app.config['MYSQL_USER'] = 'root'
-app.config['MYSQL_PASSWORD'] = 'admin123'
+app.config['MYSQL_PASSWORD'] = 'test123456'
 app.config['MYSQL_DB'] = 'agendanails'
-app.config['MYSQL_PORT'] = 3307
+app.config['MYSQL_PORT'] = 3306
 
 mysql = MySQL(app)
 
 def get_cursor(dictionary=False):
+    """Obtiene un cursor de la base de datos"""
     if dictionary:
         try:
             return mysql.connection.cursor(MySQLdb.cursors.DictCursor)
         except AttributeError:
-            print("Error al usar DictCursor. Intentando usar el cursor predeterminado.")
+            print("Error al usar DictCursor.")
             return mysql.connection.cursor()
     else:
         return mysql.connection.cursor()
@@ -45,16 +47,18 @@ def login():
         
         cur = get_cursor(dictionary=True)
         cur.execute("SELECT id_Usuario, username, password_hash, is_admin FROM usuarios WHERE username = %s", (username,))
-        usuarios = cur.fetchone()
+        usuario = cur.fetchone()
         cur.close()
 
-        if usuarios and check_password_hash(usuarios['password_hash'], password):
-            session['user_id'] = usuarios['id_Usuario']
-            session['username'] = usuarios['username']
-            session['is_admin'] = usuarios.get('is_admin', False)
+        if usuario and check_password_hash(usuario['password_hash'], password):
+            session['user_id'] = usuario['id_Usuario']
+            session['username'] = usuario['username']
+            # Convertir is_admin a boolean correctamente
+            session['is_admin'] = bool(usuario.get('is_admin', 0))
             
             flash('¡Inicio de sesión exitoso!', 'success')
             
+            # Redirigir según el tipo de usuario
             if session.get('is_admin'):
                 return redirect(url_for('admin'))
             else:
@@ -93,7 +97,7 @@ def register():
             
         password_hash = generate_password_hash(password)
         cur.execute("INSERT INTO usuarios (username, email, password_hash, is_admin, created_at) VALUES (%s, %s, %s, %s, %s)",
-                    (username, email, password_hash, False, datetime.now()))
+                    (username, email, password_hash, 0, datetime.now()))
         mysql.connection.commit()
         cur.close()
         
@@ -112,110 +116,174 @@ def logout():
 
 @app.route('/catalogo')
 def catalogo():
+    """Muestra el catálogo de servicios desde la base de datos"""
     if 'user_id' not in session:
         flash('Debes iniciar sesión para ver el catálogo', 'error')
         return redirect(url_for('login'))
         
     cur = get_cursor(dictionary=True)
-    cur.execute("SELECT * FROM servicios")
+    cur.execute("SELECT * FROM servicios ORDER BY id_Servicios")
     services = cur.fetchall()
     cur.close()
-    return render_template('catalogo.html', services=services)
-
-
-@app.route('/book_appointment/<int:service_id>', methods=['GET', 'POST'])
-def book_appointment(service_id):
-    if 'user_id' not in session:
-        flash('Debes iniciar sesión para reservar un turno', 'error')
-        return redirect(url_for('login'))
-        
-    cur = get_cursor(dictionary=True)
-    cur.execute("SELECT * FROM service WHERE id = %s", (service_id,))
-    service = cur.fetchone()
     
-    if not service:
-        cur.close()
-        flash('Servicio no encontrado', 'error')
-        return redirect(url_for('catalogo'))
+    servicios_formateados = []
+    for service in services:
+        servicios_formateados.append({
+            'id': service['id_Servicios'],
+            'nombre': service['Tipo_de_servicio'],
+            'descripcion': service['Descripcion_del_servicio'],
+            'precio': float(service['Precio']),
+            'duracion': service['Duracion']
+        })
+    
+    return render_template('catalogo.html', services=servicios_formateados)
+
+
+@app.route('/agendar_turno', methods=['POST'])
+def agendar_turno():
+    """Endpoint para agendar un turno"""
+    if 'user_id' not in session:
+        return jsonify({'success': False, 'message': 'Debes iniciar sesión'}), 401
+    
+    try:
+        data = request.get_json()
+        servicios = data.get('servicios', [])
+        fecha = data.get('fecha')
+        hora = data.get('hora')
         
-    if request.method == 'POST':
-        date_str = request.form['date']
-        time_str = request.form['time']
+        if not all([servicios, fecha, hora]):
+            return jsonify({'success': False, 'message': 'Faltan datos requeridos'}), 400
         
-        try:
-            appointment_datetime = datetime.strptime(f"{date_str} {time_str}", "%Y-%m-%d %H:%M")
-            
-            if appointment_datetime < datetime.now():
-                flash('No puedes reservar turnos en el pasado', 'error')
-                cur.close()
-                return render_template('book_appointment.html', service=service, today=datetime.now().strftime('%Y-%m-%d'))
-                
-            cur.execute("SELECT * FROM appointment WHERE appointment_date = %s", (appointment_datetime,))
-            if cur.fetchone():
-                flash('Este horario ya está ocupado', 'error')
-                cur.close()
-                return render_template('book_appointment.html', service=service, today=datetime.now().strftime('%Y-%m-%d'))
-                
-            cur.execute("INSERT INTO appointment (user_id, service_id, appointment_date, status, created_at) VALUES (%s, %s, %s, %s, %s)",
-                        (session['user_id'], service_id, appointment_datetime, 'pending', datetime.now()))
-            mysql.connection.commit()
-            flash('¡Turno reservado exitosamente!', 'success')
+        fecha_obj = datetime.strptime(fecha, "%Y-%m-%d").date()
+        hora_obj = datetime.strptime(hora, "%H:%M").time()
+        fecha_hora_completa = datetime.combine(fecha_obj, hora_obj)
+        
+        if fecha_hora_completa < datetime.now():
+            return jsonify({'success': False, 'message': 'No puedes agendar turnos en el pasado'}), 400
+        
+        cur = get_cursor(dictionary=True)
+        cur.execute("""
+            SELECT * FROM turnos 
+            WHERE fecha = %s AND hora = %s 
+            AND Estado_del_turno NOT IN ('cancelado')
+        """, (fecha, hora))
+        
+        if cur.fetchone():
             cur.close()
-            return redirect(url_for('my_appointments'))
-            
-        except ValueError:
-            flash('Fecha u hora inválida', 'error')
-            
-    cur.close()
-    return render_template('book_appointment.html', service=service, today=datetime.now().strftime('%Y-%m-%d'))
+            return jsonify({'success': False, 'message': 'Este horario ya está ocupado'}), 400
+        
+        ids_servicios = [s['id'] for s in servicios if 'id' in s]
+        servicios_nombres = [s.get('nombre', s.get('Tipo_de_servicio', '')) for s in servicios]
+        servicios_str = ', '.join(servicios_nombres)
+        
+        if ids_servicios:
+            placeholders = ','.join(['%s'] * len(ids_servicios))
+            cur.execute(f"SELECT SUM(Precio) as total FROM servicios WHERE id_Servicios IN ({placeholders})", ids_servicios)
+            resultado = cur.fetchone()
+            total = float(resultado['total']) if resultado['total'] else 0
+        else:
+            total = sum(float(s.get('precio', s.get('Precio', 0))) for s in servicios)
+        
+        id_servicio_principal = ids_servicios[0] if ids_servicios else None
+        
+        cur.execute("""
+            INSERT INTO turnos (id_Usuario, id_Servicio, Servicios, fecha, hora, Total, Estado_del_turno, created_at)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+        """, (session['user_id'], id_servicio_principal, servicios_str, fecha, hora, total, 'pendiente', datetime.now()))
+        
+        mysql.connection.commit()
+        cur.close()
+        
+        return jsonify({'success': True, 'message': 'Turno agendado exitosamente'}), 200
+        
+    except Exception as e:
+        print(f"Error al agendar turno: {e}")
+        import traceback
+        traceback.print_exc()
+        return jsonify({'success': False, 'message': f'Error al agendar turno: {str(e)}'}), 500
 
 
-@app.route('/my_appointments')
-def my_appointments():
+@app.route('/mis_turnos')
+def mis_turnos():
+    """Muestra los turnos del usuario actual"""
     if 'user_id' not in session:
         flash('Debes iniciar sesión para ver tus turnos', 'error')
         return redirect(url_for('login'))
-        
-    cur = get_cursor(dictionary=True)
-    cur.execute("""
-        SELECT 
-            a.id, a.appointment_date, a.status, 
-            s.name AS service_name, s.price, s.duration, s.description AS service_description
-        FROM appointment a
-        JOIN service s ON a.service_id = s.id
-        WHERE a.user_id = %s 
-        ORDER BY a.appointment_date
-    """, (session['user_id'],))
-    appointments = cur.fetchall()
-    cur.close()
-    return render_template('my_appointments.html', appointments=appointments)
-
-
-@app.route('/cancel_appointment/<int:appointment_id>')
-def cancel_appointment(appointment_id):
-    if 'user_id' not in session:
-        flash('Debes iniciar sesión', 'error')
-        return redirect(url_for('login'))
-        
-    cur = get_cursor(dictionary=True)
-    cur.execute("SELECT user_id FROM appointment WHERE id = %s", (appointment_id,))
-    appointment = cur.fetchone()
     
-    if not appointment:
+    try:
+        cur = get_cursor(dictionary=True)
+        cur.execute("""
+            SELECT t.*, u.username, u.email
+            FROM turnos t
+            JOIN usuarios u ON t.id_Usuario = u.id_Usuario
+            WHERE t.id_Usuario = %s
+            ORDER BY t.fecha DESC, t.hora DESC
+        """, (session['user_id'],))
+        turnos = cur.fetchall()
         cur.close()
-        flash('Turno no encontrado', 'error')
-        return redirect(url_for('my_appointments'))
         
-    if appointment['user_id'] != session['user_id'] and not session.get('is_admin'):
+        turnos_formateados = []
+        for turno in turnos:
+            turno_formateado = dict(turno)
+            
+            if turno_formateado.get('fecha'):
+                if isinstance(turno_formateado['fecha'], datetime):
+                    turno_formateado['fecha'] = turno_formateado['fecha'].strftime('%Y-%m-%d')
+                elif hasattr(turno_formateado['fecha'], 'strftime'):
+                    turno_formateado['fecha'] = turno_formateado['fecha'].strftime('%Y-%m-%d')
+                else:
+                    turno_formateado['fecha'] = str(turno_formateado['fecha'])
+            
+            if turno_formateado.get('hora'):
+                if isinstance(turno_formateado['hora'], datetime):
+                    turno_formateado['hora'] = turno_formateado['hora'].strftime('%H:%M')
+                elif hasattr(turno_formateado['hora'], 'strftime'):
+                    turno_formateado['hora'] = turno_formateado['hora'].strftime('%H:%M')
+                else:
+                    if hasattr(turno_formateado['hora'], 'seconds'):
+                        total_seconds = turno_formateado['hora'].seconds
+                        hours = total_seconds // 3600
+                        minutes = (total_seconds % 3600) // 60
+                        turno_formateado['hora'] = f"{hours:02d}:{minutes:02d}"
+                    else:
+                        turno_formateado['hora'] = str(turno_formateado['hora'])
+            
+            turnos_formateados.append(turno_formateado)
+        
+        return render_template('mis_turnos.html', turnos=turnos_formateados)
+        
+    except Exception as e:
+        print(f"Error en mis_turnos: {e}")
+        import traceback
+        traceback.print_exc()
+        flash('Error al cargar los turnos', 'error')
+        return redirect(url_for('catalogo'))
+
+
+@app.route('/cancelar_turno/<int:turno_id>', methods=['POST'])
+def cancelar_turno(turno_id):
+    """Cancela un turno"""
+    if 'user_id' not in session:
+        return jsonify({'success': False, 'message': 'No autorizado'}), 401
+    
+    cur = get_cursor(dictionary=True)
+    cur.execute("SELECT id_Usuario FROM turnos WHERE id_Turnos = %s", (turno_id,))
+    turno = cur.fetchone()
+    
+    if not turno:
         cur.close()
-        flash('No tienes permisos para cancelar este turno', 'error')
-        return redirect(url_for('my_appointments'))
-        
-    cur.execute("UPDATE appointment SET status = 'cancelled' WHERE id = %s", (appointment_id,))
+        return jsonify({'success': False, 'message': 'Turno no encontrado'}), 404
+    
+    if turno['id_Usuario'] != session['user_id'] and not session.get('is_admin'):
+        cur.close()
+        return jsonify({'success': False, 'message': 'No tienes permisos para cancelar este turno'}), 403
+    
+    cur.execute("UPDATE turnos SET Estado_del_turno = 'cancelado' WHERE id_Turnos = %s", (turno_id,))
     mysql.connection.commit()
     cur.close()
-    flash('Turno cancelado exitosamente', 'success')
-    return redirect(url_for('my_appointments'))
+    
+    return jsonify({'success': True, 'message': 'Turno cancelado exitosamente'}), 200
+
 
 # -----------------------------
 # Rutas de administrador
@@ -223,65 +291,110 @@ def cancel_appointment(appointment_id):
 
 @app.route('/admin')
 def admin():
+    """Panel de administración"""
     if 'user_id' not in session or not session.get('is_admin'):
-        flash('Acceso denegado', 'error')
+        flash('Acceso denegado. Solo administradores pueden acceder.', 'error')
         return redirect(url_for('index'))
+    
+    try:
+        cur = get_cursor(dictionary=True)
         
-    cur = get_cursor(dictionary=True)
-    
-    cur.execute("""
-        SELECT 
-            a.id, a.appointment_date, a.status, 
-            s.name AS service_name, s.price,
-            u.username AS user_name, u.email 
-        FROM appointment a
-        JOIN service s ON a.service_id = s.id
-        JOIN usuarios u ON a.user_id = u.id
-        ORDER BY a.appointment_date
-    """)
-    appointments = cur.fetchall()
-    
-    cur.execute("SELECT * FROM service")
-    services = cur.fetchall()
-    
-    cur.execute("SELECT id, username, email, is_admin FROM usuarios")
-    users = cur.fetchall()
-    
-    cur.close()
-    return render_template('admin.html', appointments=appointments, services=services, users=users)
+        # Obtener todos los turnos
+        cur.execute("""
+            SELECT t.*, u.username, u.email
+            FROM turnos t
+            JOIN usuarios u ON t.id_Usuario = u.id_Usuario
+            ORDER BY t.fecha DESC, t.hora DESC
+        """)
+        turnos_raw = cur.fetchall()
+        
+        # Formatear turnos
+        turnos = []
+        for turno in turnos_raw:
+            turno_formateado = dict(turno)
+            
+            if turno_formateado.get('fecha'):
+                if isinstance(turno_formateado['fecha'], datetime):
+                    turno_formateado['fecha_str'] = turno_formateado['fecha'].strftime('%d/%m/%Y')
+                elif hasattr(turno_formateado['fecha'], 'strftime'):
+                    turno_formateado['fecha_str'] = turno_formateado['fecha'].strftime('%d/%m/%Y')
+                else:
+                    turno_formateado['fecha_str'] = str(turno_formateado['fecha'])
+            else:
+                turno_formateado['fecha_str'] = 'N/A'
+            
+            if turno_formateado.get('hora'):
+                if isinstance(turno_formateado['hora'], datetime):
+                    turno_formateado['hora_str'] = turno_formateado['hora'].strftime('%H:%M')
+                elif hasattr(turno_formateado['hora'], 'strftime'):
+                    turno_formateado['hora_str'] = turno_formateado['hora'].strftime('%H:%M')
+                else:
+                    if hasattr(turno_formateado['hora'], 'seconds'):
+                        total_seconds = turno_formateado['hora'].seconds
+                        hours = total_seconds // 3600
+                        minutes = (total_seconds % 3600) // 60
+                        turno_formateado['hora_str'] = f"{hours:02d}:{minutes:02d}"
+                    else:
+                        turno_formateado['hora_str'] = str(turno_formateado['hora'])
+            else:
+                turno_formateado['hora_str'] = 'N/A'
+            
+            turnos.append(turno_formateado)
+        
+        # Obtener todos los servicios
+        cur.execute("SELECT * FROM servicios ORDER BY id_Servicios")
+        servicios = cur.fetchall()
+        
+        # Obtener todos los usuarios
+        cur.execute("SELECT id_Usuario, username, email, is_admin, created_at FROM usuarios ORDER BY created_at DESC")
+        usuarios = cur.fetchall()
+        
+        cur.close()
+        
+        return render_template('admin.html', turnos=turnos, servicios=servicios, usuarios=usuarios)
+        
+    except Exception as e:
+        print(f"Error en admin: {e}")
+        import traceback
+        traceback.print_exc()
+        flash('Error al cargar el panel de administración', 'error')
+        return redirect(url_for('index'))
 
 
-@app.route('/admin/add_service', methods=['GET', 'POST'])
-def add_service():
+@app.route('/admin/servicios/agregar', methods=['GET', 'POST'])
+def admin_agregar_servicio():
+    """Agregar un nuevo servicio"""
     if 'user_id' not in session or not session.get('is_admin'):
         flash('Acceso denegado', 'error')
         return redirect(url_for('index'))
         
     if request.method == 'POST':
-        name = request.form['name']
-        description = request.form['description']
+        tipo_servicio = request.form['tipo_servicio']
+        descripcion = request.form['descripcion']
         try:
-            price = float(request.form['price'])
-            duration = int(request.form['duration'])
+            duracion = int(request.form['duracion'])
+            precio = float(request.form['precio'])
         except ValueError:
-            flash('Precio o duración inválida', 'error')
-            return render_template('add_service.html')
+            flash('Duración o precio inválido', 'error')
+            return render_template('admin_agregar_servicio.html')
             
-        image_url = request.form['image_url']
-        
         cur = get_cursor()
-        cur.execute("INSERT INTO service (name, description, price, duration, image_url) VALUES (%s, %s, %s, %s, %s)",
-                    (name, description, price, duration, image_url))
+        cur.execute("""
+            INSERT INTO servicios (Tipo_de_servicio, Descripcion_del_servicio, Duracion, Precio, created_at)
+            VALUES (%s, %s, %s, %s, %s)
+        """, (tipo_servicio, descripcion, duracion, precio, datetime.now()))
         mysql.connection.commit()
         cur.close()
+        
         flash('Servicio agregado exitosamente', 'success')
         return redirect(url_for('admin'))
         
-    return render_template('add_service.html')
+    return render_template('admin_agregar_servicio.html')
 
 
-@app.route('/admin/edit_service/<int:service_id>', methods=['GET', 'POST'])
-def edit_service(service_id):
+@app.route('/admin/servicios/editar/<int:servicio_id>', methods=['GET', 'POST'])
+def admin_editar_servicio(servicio_id):
+    """Editar un servicio existente"""
     if 'user_id' not in session or not session.get('is_admin'):
         flash('Acceso denegado', 'error')
         return redirect(url_for('index'))
@@ -289,98 +402,80 @@ def edit_service(service_id):
     cur = get_cursor(dictionary=True)
     
     if request.method == 'POST':
-        name = request.form['name']
-        description = request.form['description']
+        tipo_servicio = request.form['tipo_servicio']
+        descripcion = request.form['descripcion']
         try:
-            price = float(request.form['price'])
-            duration = int(request.form['duration'])
+            duracion = int(request.form['duracion'])
+            precio = float(request.form['precio'])
         except ValueError:
-            flash('Precio o duración inválida', 'error')
-            return redirect(url_for('edit_service', service_id=service_id))
+            flash('Duración o precio inválido', 'error')
+            return redirect(url_for('admin_editar_servicio', servicio_id=servicio_id))
             
-        image_url = request.form['image_url']
-        
-        cur.execute("""UPDATE service 
-                      SET name = %s, description = %s, price = %s, duration = %s, image_url = %s 
-                      WHERE id = %s""",
-                    (name, description, price, duration, image_url, service_id))
+        cur.execute("""
+            UPDATE servicios 
+            SET Tipo_de_servicio = %s, Descripcion_del_servicio = %s, Duracion = %s, Precio = %s
+            WHERE id_Servicios = %s
+        """, (tipo_servicio, descripcion, duracion, precio, servicio_id))
         mysql.connection.commit()
         cur.close()
         flash('Servicio actualizado exitosamente', 'success')
         return redirect(url_for('admin'))
     
-    cur.execute("SELECT * FROM service WHERE id = %s", (service_id,))
-    service = cur.fetchone()
+    cur.execute("SELECT * FROM servicios WHERE id_Servicios = %s", (servicio_id,))
+    servicio = cur.fetchone()
     cur.close()
     
-    if not service:
+    if not servicio:
         flash('Servicio no encontrado', 'error')
         return redirect(url_for('admin'))
     
-    return render_template('edit_service.html', service=service)
+    return render_template('admin_editar_servicio.html', servicio=servicio)
 
 
-@app.route('/admin/delete_service/<int:service_id>')
-def delete_service(service_id):
+@app.route('/admin/servicios/eliminar/<int:servicio_id>', methods=['POST'])
+def admin_eliminar_servicio(servicio_id):
+    """Eliminar un servicio"""
     if 'user_id' not in session or not session.get('is_admin'):
-        flash('Acceso denegado', 'error')
-        return redirect(url_for('index'))
+        return jsonify({'success': False, 'message': 'Acceso denegado'}), 403
     
     cur = get_cursor()
-    cur.execute("DELETE FROM service WHERE id = %s", (service_id,))
+    cur.execute("DELETE FROM servicios WHERE id_Servicios = %s", (servicio_id,))
     mysql.connection.commit()
     cur.close()
+    
     flash('Servicio eliminado exitosamente', 'success')
     return redirect(url_for('admin'))
 
 
-@app.route('/admin/confirm_appointment/<int:appointment_id>')
-def confirm_appointment(appointment_id):
+@app.route('/admin/turnos/confirmar/<int:turno_id>', methods=['POST'])
+def admin_confirmar_turno(turno_id):
+    """Confirmar un turno"""
     if 'user_id' not in session or not session.get('is_admin'):
-        flash('Acceso denegado', 'error')
-        return redirect(url_for('index'))
+        return jsonify({'success': False, 'message': 'Acceso denegado'}), 403
         
     cur = get_cursor()
-    cur.execute("UPDATE appointment SET status = 'confirmed' WHERE id = %s", (appointment_id,))
+    cur.execute("UPDATE turnos SET Estado_del_turno = 'confirmado' WHERE id_Turnos = %s", (turno_id,))
     mysql.connection.commit()
     cur.close()
+    
     flash('Turno confirmado exitosamente', 'success')
     return redirect(url_for('admin'))
 
-# -----------------------------
-# Funciones de utilidad
-# -----------------------------
 
-def create_sample_data():
-    cur = get_cursor(dictionary=True)
-    
-    services = [
-        ('Manicure Básica', 'Limpieza, corte y esmaltado de uñas', 25.00, 30, '/static/images/manicure.jpg'),
-        ('Pedicure Completa', 'Limpieza, corte, exfoliación y esmaltado de pies', 35.00, 45, '/static/images/pedicure.jpg'),
-        ('Uñas Acrílicas', 'Aplicación de uñas acrílicas con diseño', 45.00, 60, '/static/images/acrylic.jpg'),
-        ('Gelish', 'Esmaltado semipermanente con gel', 30.00, 40, '/static/images/gelish.jpg')
-    ]
-    
-    for s in services:
-        cur.execute("SELECT * FROM service WHERE name = %s", (s[0],))
-        if not cur.fetchone():
-            insert_cur = get_cursor() 
-            insert_cur.execute("INSERT INTO service (name, description, price, duration, image_url) VALUES (%s, %s, %s, %s, %s)", s)
-            insert_cur.close()
-
-    cur.execute("SELECT * FROM usuarios WHERE username = 'admin'")
-    if not cur.fetchone():
-        insert_cur = get_cursor()
-        insert_cur.execute("INSERT INTO usuarios (username, email, password_hash, is_admin, created_at) VALUES (%s, %s, %s, %s, %s)",
-                         ('admin', 'admin@nailstudio.com', generate_password_hash('admin123'), True, datetime.now()))
-        insert_cur.close()
+@app.route('/admin/turnos/completar/<int:turno_id>', methods=['POST'])
+def admin_completar_turno(turno_id):
+    """Marcar un turno como completado"""
+    if 'user_id' not in session or not session.get('is_admin'):
+        return jsonify({'success': False, 'message': 'Acceso denegado'}), 403
         
+    cur = get_cursor()
+    cur.execute("UPDATE turnos SET Estado_del_turno = 'completado' WHERE id_Turnos = %s", (turno_id,))
     mysql.connection.commit()
     cur.close()
+    
+    flash('Turno marcado como completado', 'success')
+    return redirect(url_for('admin'))
+
 
 if __name__ == '__main__':
-    with app.app_context():
-        create_sample_data()
     app.run(debug=True)
-    
-    

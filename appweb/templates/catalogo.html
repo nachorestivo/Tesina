@@ -4,56 +4,45 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Catálogo de Turnos - Nails Studio</title>
-   <link rel="stylesheet" href="{{ url_for('static', filename='catalogo.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='catalogo.css') }}">
 </head>
 <body>
 
   <header>
     <h1>Agenda Nails - Catálogo de Turnos</h1>
-  <button class="volver-inicio" onclick="window.location.href='/'">Volver al inicio</button>
+    <button class="volver-inicio" onclick="window.location.href='/'">Volver al inicio</button>
+    <a href="{{ url_for('mis_turnos') }}" style="margin-left: 10px;">Mis Turnos</a>
+    <a href="{{ url_for('logout') }}" style="margin-left: 10px;">Cerrar Sesión</a>
   </header>
 
-  <!-- Botón para entrar al modo administrador -->
+  <!-- Botón para entrar al modo administrador (solo si es admin) -->
+  {% if session.get('is_admin') %}
   <div class="admin-access">
-    <button id="btn-admin">Modo Administrador</button>
+    <a href="{{ url_for('admin') }}" style="text-decoration: none;">
+      <button id="btn-admin">Panel Administrador</button>
+    </a>
   </div>
+  {% endif %}
 
   <!-- Sección visible para el usuario -->
   <section id="usuario">
     <!-- Catálogo de servicios -->
-    <div class="catalogo">
-      <!-- 12 servicios sin imágenes -->
-      <div class="card" data-nombre="Esmaltado Semipermanente" data-precio="10000">
-        <h3>Esmaltado Semipermanente</h3>
-        <p>Tecnica que conciste en aplicar un gel o esmalte especial sobre la uña natural y secado con luz Led o UV. Deja un acabado brillante y duradero por 21 dias.</p>
-        <p>Duración 1 hora</p>
-        <span class="precio">$10.000</span>
-        <button class="btn-agregar">Agregar</button>
-      </div>
-
-      <div class="card" data-nombre="Soft Gel" data-precio="18000">
-        <h3>Soft Gel</h3>
-        <p>El sisitema de Soft Gel consiste en aplicar uñas de gel preformadas que se adieren con gel y luz led, logrando extensiones duraderas y de aspecto natural.</p>
-        <p>Duración 1 hora y 30 minutos</p>
-        <span class="precio">$18.000</span>
-        <button class="btn-agregar">Agregar</button>
-      </div>
-
-      <div class="card" data-nombre="Capping" data-precio="15000">
-        <h3>Capping</h3>
-        <p>El capping consiste en proteger la uña natural aplicado una capa de gel o acrilico sobre ella sin alargarla. Aporta brillo, dureza y mayor duracion al esmaltado.</p>
-        <p>Duración 1 hora</p>
-        <span class="precio">$15.000</span>
-        <button class="btn-agregar">Agregar</button>
-      </div>
-
-      <div class="card" data-nombre="Sistema Polygel" data-precio="20000">
-        <h3>Sistema Polygel</h3>
-        <p>El sistema Polygel combina acrilico y gel, logrando una textura resistente. Se usa para esculpir o alagar uñas, ofreciendo un acabado natural y duradero.</p>
-        <p>Duración 2 horas</p>
-        <span class="precio">$20.000</span>
-        <button class="btn-agregar">Agregar</button>
-      </div>
+    <div class="catalogo" id="catalogo-servicios">
+      <!-- Los servicios se cargarán dinámicamente desde la base de datos -->
+      {% if services %}
+        {% for service in services %}
+        <div class="card" data-id="{{ service.id }}" data-nombre="{{ service.nombre }}" data-precio="{{ service.precio }}">
+          <h3>{{ service.nombre }}</h3>
+          <p>{{ service.descripcion }}</p>
+          <p>Duración: {{ service.duracion }} minutos</p>
+          <span class="precio">${{ "{:,.0f}".format(service.precio) }}</span>
+          <button class="btn-agregar" data-id="{{ service.id }}" data-nombre="{{ service.nombre }}" data-precio="{{ service.precio }}">Agregar</button>
+        </div>
+        {% endfor %}
+      {% else %}
+        <p>No hay servicios disponibles en este momento.</p>
+      {% endif %}
+    </div>
 
     <!-- Carrito -->
     <aside class="carrito">
@@ -61,187 +50,190 @@
       <ul id="lista-carrito"></ul>
       <p id="total">Total: $0</p>
 
-      <input type="text" id="nombre" placeholder="Tu nombre completo">
-      <input type="date" id="fecha">
-      <select id="horario">
-        <option value="">Selecciona horario</option>
-      </select>
+      <input type="date" id="fecha" required>
+      <input type="time" id="horario" required>
+      <small style="display: block; margin-top: 10px; color: #666;">
+        Selecciona fecha y hora para tu turno
+      </small>
 
       <button id="btn-agendar">Agendar turno</button>
-        <div class="turno">
-    <div class="button-container">
-      <a href="cancelar.html" class="btn cancel">Cancelar turno</a>
-    </div>
-  </div>
+      <div class="turno">
+        <div class="button-container">
+          <a href="{{ url_for('mis_turnos') }}" class="btn cancel">Ver mis turnos</a>
+        </div>
+      </div>
     </aside>
   </section>
 
-
-  <!-- Modal -->
+  <!-- Modal de éxito -->
   <div id="modal" class="modal oculto">
     <div class="modal-contenido">
       <h3>¡Turno agendado con éxito!</h3>
       <p>Gracias por elegirnos 💅</p>
+      <button onclick="cerrarModal()">Cerrar</button>
     </div>
   </div>
 
-  <!-- Panel del administrador -->
-  <section id="admin" class="oculto">
-    <button class="cerrar-admin">Cerrar panel</button>
-    <h2>Panel del Administrador</h2>
-
-    <!-- Form para cargar horarios -->
-    <form class="admin-form" id="form-horario">
-      <h3>Agregar horario disponible:</h3>
-      <input type="time" id="nuevo-horario" required>
-      <button type="submit" id="btn-agregar-horario">Agregar horario</button>
-      <ul id="lista-horarios"></ul>
-    </form>
-
-    <!-- Tabla de turnos -->
-    <h3>Turnos agendados:</h3>
-    <table>
-      <thead>
-        <tr>
-          <th>Cliente</th>
-          <th>Servicios</th>
-          <th>Fecha</th>
-          <th>Horario</th>
-          <th>Total</th>
-        </tr>
-      </thead>
-      <tbody id="tabla-turnos"></tbody>
-    </table>
-  </section>
+  <!-- Modal de error -->
+  <div id="modal-error" class="modal oculto">
+    <div class="modal-contenido error">
+      <h3>Error</h3>
+      <p id="mensaje-error"></p>
+      <button onclick="cerrarModalError()">Cerrar</button>
+    </div>
+  </div>
 
   <script>
     // --- Variables principales ---
-    const botonesAgregar = document.querySelectorAll('.btn-agregar');
     const listaCarrito = document.getElementById('lista-carrito');
     const totalElemento = document.getElementById('total');
     const btnAgendar = document.getElementById('btn-agendar');
     const modal = document.getElementById('modal');
+    const modalError = document.getElementById('modal-error');
     const fechaInput = document.getElementById('fecha');
-    const horarioSelect = document.getElementById('horario');
-    const adminPanel = document.getElementById('admin');
-    const btnAdmin = document.getElementById('btn-admin');
-    const cerrarAdmin = document.querySelector('.cerrar-admin');
-    const tablaTurnos = document.getElementById('tabla-turnos');
-    const formHorario = document.getElementById('form-horario');
-    const listaHorarios = document.getElementById('lista-horarios');
-    const nuevoHorario = document.getElementById('nuevo-horario');
+    const horarioInput = document.getElementById('horario');
 
     let carrito = [];
-    let horariosDisponibles = [];
-    let turnosAgendados = [];
 
     // --- Deshabilitar fechas anteriores ---
-    const hoy = new Date().toISOString().split('T')[0];
-    fechaInput.setAttribute('min', hoy);
+    const hoy = new Date();
+    hoy.setHours(0, 0, 0, 0);
+    fechaInput.setAttribute('min', hoy.toISOString().split('T')[0]);
 
     // --- Agregar servicio al carrito ---
-    botonesAgregar.forEach(btn => {
+    document.querySelectorAll('.btn-agregar').forEach(btn => {
       btn.addEventListener('click', () => {
-        const card = btn.closest('.card');
-        const nombre = card.dataset.nombre;
-        const precio = parseFloat(card.dataset.precio);
-        carrito.push({ nombre, precio });
-        actualizarCarrito();
+        const serviceId = parseInt(btn.dataset.id);
+        const serviceNombre = btn.dataset.nombre;
+        const servicePrecio = parseFloat(btn.dataset.precio);
+        
+        // Verificar si el servicio ya está en el carrito
+        const existe = carrito.find(item => item.id === serviceId);
+        if (!existe) {
+          carrito.push({
+            id: serviceId,
+            nombre: serviceNombre,
+            precio: servicePrecio
+          });
+          actualizarCarrito();
+        } else {
+          alert('Este servicio ya está en tu carrito');
+        }
       });
     });
 
     function actualizarCarrito() {
       listaCarrito.innerHTML = '';
       let total = 0;
-      carrito.forEach(item => {
+      
+      carrito.forEach((item, index) => {
         const li = document.createElement('li');
-        li.textContent = `${item.nombre} - $${item.precio}`;
+        li.innerHTML = `
+          ${item.nombre} - $${item.precio.toLocaleString('es-AR')}
+          <button onclick="eliminarDelCarrito(${index})" style="margin-left: 10px; background: red; color: white; border: none; padding: 2px 8px; cursor: pointer;">X</button>
+        `;
         listaCarrito.appendChild(li);
         total += item.precio;
       });
-      totalElemento.textContent = `Total: $${total}`;
+      
+      totalElemento.textContent = `Total: $${total.toLocaleString('es-AR')}`;
+    }
+
+    function eliminarDelCarrito(index) {
+      carrito.splice(index, 1);
+      actualizarCarrito();
     }
 
     // --- Agendar turno ---
-    btnAgendar.addEventListener('click', () => {
-      const nombre = document.getElementById('nombre').value.trim();
+    btnAgendar.addEventListener('click', async () => {
       const fecha = fechaInput.value;
-      const horario = horarioSelect.value;
-      if (!nombre || !fecha || !horario || carrito.length === 0) {
-        alert('Completa todos los campos antes de agendar.');
+      const hora = horarioInput.value;
+
+      if (!fecha || !hora) {
+        mostrarError('Por favor selecciona fecha y hora');
         return;
       }
-      const total = carrito.reduce((s, i) => s + i.precio, 0);
-      const servicios = carrito.map(i => i.nombre).join(', ');
-      const turno = { nombre, servicios, fecha, horario, total };
-      turnosAgendados.push(turno);
-      agregarTurnoATabla(turno);
-      carrito = [];
-      actualizarCarrito();
-      modal.classList.remove('oculto');
-      setTimeout(() => modal.classList.add('oculto'), 2500);
-    });
 
-    function agregarTurnoATabla(turno) {
-      const tr = document.createElement('tr');
-      tr.innerHTML = `
-        <td data-label="Cliente">${turno.nombre}</td>
-        <td data-label="Servicios">${turno.servicios}</td>
-        <td data-label="Fecha">${turno.fecha}</td>
-        <td data-label="Horario">${turno.horario}</td>
-        <td data-label="Total">$${turno.total}</td>
-      `;
-      tablaTurnos.appendChild(tr);
-    }
+      if (carrito.length === 0) {
+        mostrarError('Por favor agrega al menos un servicio al carrito');
+        return;
+      }
 
-    // --- Acceso administrador con contraseña ---
-    btnAdmin.addEventListener('click', () => {
-      const pass = prompt("Ingrese la contraseña de administrador:");
-      if (pass === "admin123") {
-        adminPanel.classList.remove('oculto');
-        window.scrollTo({ top: adminPanel.offsetTop, behavior: 'smooth' });
-      } else if (pass !== null) {
-        alert("Contraseña incorrecta.");
+      // Validar que la fecha no sea en el pasado
+      const fechaSeleccionada = new Date(fecha + 'T' + hora);
+      if (fechaSeleccionada < new Date()) {
+        mostrarError('No puedes agendar turnos en el pasado');
+        return;
+      }
+
+      // Preparar datos para enviar
+      const datosTurno = {
+        servicios: carrito,
+        fecha: fecha,
+        hora: hora
+      };
+
+      try {
+        const response = await fetch('/agendar_turno', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(datosTurno)
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+          // Limpiar carrito y formulario
+          carrito = [];
+          actualizarCarrito();
+          fechaInput.value = '';
+          horarioInput.value = '';
+          
+          // Mostrar modal de éxito
+          modal.classList.remove('oculto');
+          setTimeout(() => {
+            cerrarModal();
+          }, 3000);
+        } else {
+          mostrarError(data.message || 'Error al agendar el turno');
+        }
+      } catch (error) {
+        console.error('Error:', error);
+        mostrarError('Error de conexión. Por favor intenta nuevamente.');
       }
     });
 
-    cerrarAdmin.addEventListener('click', () => {
-      adminPanel.classList.add('oculto');
-    });
-
-    // --- Administración de horarios ---
-    formHorario.addEventListener('submit', e => {
-      e.preventDefault();
-      const hora = nuevoHorario.value;
-      if (hora && !horariosDisponibles.includes(hora)) {
-        horariosDisponibles.push(hora);
-        actualizarHorarios();
-        nuevoHorario.value = '';
-      }
-    });
-
-    function actualizarHorarios() {
-      listaHorarios.innerHTML = '';
-      horarioSelect.innerHTML = '<option value="">Selecciona horario</option>';
-      horariosDisponibles.forEach(hora => {
-        const li = document.createElement('li');
-        li.textContent = hora;
-        listaHorarios.appendChild(li);
-
-        const opt = document.createElement('option');
-        opt.value = hora;
-        opt.textContent = hora;
-        horarioSelect.appendChild(opt);
-      });
+    function mostrarError(mensaje) {
+      document.getElementById('mensaje-error').textContent = mensaje;
+      modalError.classList.remove('oculto');
     }
-    
-  // Cuando confirmes/agendes un turno, guarda los datos en localStorage
-  function guardarTurno(servicio, fecha, hora) {
-    const turnos = JSON.parse(localStorage.getItem('turnos')) || [];
-    turnos.push({ servicio, fecha, hora });
-    localStorage.setItem('turnos', JSON.stringify(turnos));
-    alert("Turno agendado correctamente");
-  }
+
+    function cerrarModal() {
+      modal.classList.add('oculto');
+    }
+
+    function cerrarModalError() {
+      modalError.classList.add('oculto');
+    }
+
+    // Generar horarios disponibles (ejemplo: cada hora de 9:00 a 18:00)
+    function generarHorarios() {
+      const horarios = [];
+      for (let h = 9; h <= 18; h++) {
+        for (let m = 0; m < 60; m += 30) {
+          const hora = String(h).padStart(2, '0');
+          const minuto = String(m).padStart(2, '0');
+          horarios.push(`${hora}:${minuto}`);
+        }
+      }
+      return horarios;
+    }
+
+    // Cargar horarios disponibles en el input time
+    // Nota: Los navegadores modernos permiten usar step en input type="time"
+    horarioInput.setAttribute('step', '1800'); // 30 minutos
   </script>
 </body>
 </html>

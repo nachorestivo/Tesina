@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Panel Administrador - Nails Studio</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      font-family: Arial, sans-serif;
+      background: #f5f5f5;
+      padding: 20px;
+    }
+    .header {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 20px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .header h1 {
+      color: white;
+    }
+    .nav-links a {
+      margin-left: 15px;
+      text-decoration: none;
+      color: white;
+      background: rgba(255,255,255,0.2);
+      padding: 8px 16px;
+      border-radius: 5px;
+      transition: background 0.3s;
+    }
+    .nav-links a:hover {
+      background: rgba(255,255,255,0.3);
+    }
+    .alert {
+      padding: 15px;
+      margin-bottom: 20px;
+      border-radius: 5px;
+    }
+    .alert-success {
+      background: #d4edda;
+      color: #155724;
+      border: 1px solid #c3e6cb;
+    }
+    .alert-error {
+      background: #f8d7da;
+      color: #721c24;
+      border: 1px solid #f5c6cb;
+    }
+    .section {
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    .section h2 {
+      margin-bottom: 20px;
+      color: #333;
+      border-bottom: 2px solid #667eea;
+      padding-bottom: 10px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+    }
+    th, td {
+      padding: 12px;
+      text-align: left;
+      border-bottom: 1px solid #ddd;
+    }
+    th {
+      background: #f8f9fa;
+      font-weight: bold;
+      color: #333;
+    }
+    tr:hover {
+      background: #f8f9fa;
+    }
+    .btn {
+      padding: 8px 16px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-block;
+      margin: 5px 5px 5px 0;
+      font-size: 14px;
+      transition: all 0.3s;
+    }
+    .btn-primary {
+      background: #667eea;
+      color: white;
+    }
+    .btn-primary:hover {
+      background: #5568d3;
+    }
+    .btn-success {
+      background: #28a745;
+      color: white;
+    }
+    .btn-success:hover {
+      background: #218838;
+    }
+    .btn-danger {
+      background: #dc3545;
+      color: white;
+    }
+    .btn-danger:hover {
+      background: #c82333;
+    }
+    .btn-warning {
+      background: #ffc107;
+      color: #000;
+    }
+    .btn-warning:hover {
+      background: #e0a800;
+    }
+    .btn-info {
+      background: #17a2b8;
+      color: white;
+    }
+    .btn-info:hover {
+      background: #138496;
+    }
+    .estado {
+      padding: 5px 10px;
+      border-radius: 5px;
+      font-size: 12px;
+      font-weight: bold;
+      display: inline-block;
+    }
+    .estado.pendiente {
+      background: #ffc107;
+      color: #000;
+    }
+    .estado.confirmado {
+      background: #28a745;
+      color: white;
+    }
+    .estado.cancelado {
+      background: #dc3545;
+      color: white;
+    }
+    .estado.completado {
+      background: #17a2b8;
+      color: white;
+    }
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 15px;
+      margin-bottom: 20px;
+    }
+    .stat-card {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 20px;
+      border-radius: 8px;
+      text-align: center;
+    }
+    .stat-card h3 {
+      font-size: 2.5em;
+      margin-bottom: 5px;
+    }
+    .stat-card p {
+      font-size: 1em;
+      opacity: 0.9;
+    }
+    .no-data {
+      text-align: center;
+      padding: 20px;
+      color: #666;
+    }
+    @media (max-width: 768px) {
+      table {
+        font-size: 12px;
+      }
+      .btn {
+        padding: 6px 12px;
+        font-size: 12px;
+      }
+      th, td {
+        padding: 8px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>🎨 Panel de Administración</h1>
+    <div class="nav-links">
+      <a href="{{ url_for('catalogo') }}">Catálogo</a>
+      <a href="{{ url_for('index') }}">Inicio</a>
+      <a href="{{ url_for('logout') }}">Cerrar Sesión</a>
+    </div>
+  </div>
+
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      {% for category, message in messages %}
+        <div class="alert alert-{{ category }}">
+          {{ message }}
+        </div>
+      {% endfor %}
+    {% endif %}
+  {% endwith %}
+
+  <!-- Estadísticas -->
+  <div class="stats">
+    <div class="stat-card">
+      <h3>{{ turnos|length }}</h3>
+      <p>Total Turnos</p>
+    </div>
+    <div class="stat-card">
+      <h3>{{ servicios|length }}</h3>
+      <p>Servicios Activos</p>
+    </div>
+    <div class="stat-card">
+      <h3>{{ usuarios|length }}</h3>
+      <p>Usuarios Registrados</p>
+    </div>
+  </div>
+
+  <!-- Gestión de Turnos -->
+  <div class="section">
+    <h2>📅 Gestión de Turnos</h2>
+    {% if turnos %}
+    <div style="overflow-x: auto;">
+      <table>
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Cliente</th>
+            <th>Email</th>
+            <th>Servicios</th>
+            <th>Fecha</th>
+            <th>Hora</th>
+            <th>Total</th>
+            <th>Estado</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for turno in turnos %}
+          <tr>
+            <td>{{ turno.id_Turnos }}</td>
+            <td>{{ turno.username }}</td>
+            <td>{{ turno.email }}</td>
+            <td>{{ turno.Servicios }}</td>
+            <td>{{ turno.fecha_str }}</td>
+            <td>{{ turno.hora_str }}</td>
+            <td>${{ "{:,.0f}".format(turno.Total) if turno.Total else '0' }}</td>
+            <td>
+              <span class="estado {{ turno.Estado_del_turno.lower() if turno.Estado_del_turno else 'pendiente' }}">
+                {{ turno.Estado_del_turno.title() if turno.Estado_del_turno else 'Pendiente' }}
+              </span>
+            </td>
+            <td>
+              {% if turno.Estado_del_turno == 'pendiente' %}
+              <form action="{{ url_for('admin_confirmar_turno', turno_id=turno.id_Turnos) }}" method="POST" style="display: inline;">
+                <button type="submit" class="btn btn-success">✓ Confirmar</button>
+              </form>
+              {% endif %}
+              {% if turno.Estado_del_turno == 'confirmado' %}
+              <form action="{{ url_for('admin_completar_turno', turno_id=turno.id_Turnos) }}" method="POST" style="display: inline;">
+                <button type="submit" class="btn btn-info">✓ Completar</button>
+              </form>
+              {% endif %}
+              {% if turno.Estado_del_turno not in ['cancelado', 'completado'] %}
+              <form action="{{ url_for('cancelar_turno', turno_id=turno.id_Turnos) }}" method="POST" style="display: inline;" onsubmit="return confirm('¿Cancelar este turno?');">
+                <button type="submit" class="btn btn-danger">✗ Cancelar</button>
+              </form>
+              {% endif %}
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% else %}
+    <p class="no-data">No hay turnos registrados.</p>
+    {% endif %}
+  </div>
+
+  <!-- Gestión de Servicios -->
+  <div class="section">
+    <h2>💅 Gestión de Servicios</h2>
+    <a href="{{ url_for('admin_agregar_servicio') }}" class="btn btn-primary">+ Agregar Nuevo Servicio</a>
+    {% if servicios %}
+    <div style="overflow-x: auto;">
+      <table>
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Tipo de Servicio</th>
+            <th>Descripción</th>
+            <th>Duración (min)</th>
+            <th>Precio</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for servicio in servicios %}
+          <tr>
+            <td>{{ servicio.id_Servicios }}</td>
+            <td>{{ servicio.Tipo_de_servicio }}</td>
+            <td>{{ servicio.Descripcion_del_servicio[:50] }}{% if servicio.Descripcion_del_servicio|length > 50 %}...{% endif %}</td>
+            <td>{{ servicio.Duracion }}</td>
+            <td>${{ "{:,.0f}".format(servicio.Precio) if servicio.Precio else '0' }}</td>
+            <td>
+              <a href="{{ url_for('admin_editar_servicio', servicio_id=servicio.id_Servicios) }}" class="btn btn-warning">✏️ Editar</a>
+              <form action="{{ url_for('admin_eliminar_servicio', servicio_id=servicio.id_Servicios) }}" method="POST" style="display: inline;" onsubmit="return confirm('¿Estás seguro de eliminar este servicio?');">
+                <button type="submit" class="btn btn-danger">🗑️ Eliminar</button>
+              </form>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% else %}
+    <p class="no-data">No hay servicios registrados.</p>
+    {% endif %}
+  </div>
+
+  <!-- Listado de Usuarios -->
+  <div class="section">
+    <h2>👥 Listado de Usuarios</h2>
+    {% if usuarios %}
+    <div style="overflow-x: auto;">
+      <table>
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Usuario</th>
+            <th>Email</th>
+            <th>Es Admin</th>
+            <th>Fecha Registro</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for usuario in usuarios %}
+          <tr>
+            <td>{{ usuario.id_Usuario }}</td>
+            <td>{{ usuario.username }}</td>
+            <td>{{ usuario.email }}</td>
+            <td>
+              {% if usuario.is_admin %}
+              <span class="estado confirmado">Sí</span>
+              {% else %}
+              <span class="estado pendiente">No</span>
+              {% endif %}
+            </td>
+            <td>{{ usuario.created_at.strftime('%d/%m/%Y %H:%M') if usuario.created_at else 'N/A' }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% else %}
+    <p class="no-data">No hay usuarios registrados.</p>
+    {% endif %}
+  </div>
+
+</body>
+</html>

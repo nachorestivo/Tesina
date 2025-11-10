@@ -5,13 +5,19 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AgendaNails - Iniciar Sesión</title>
 <link rel="stylesheet" href="{{ url_for('static', filename='ModuloL.css') }}">
-    <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 </head>
 <body>
-
-     <div class="alert alert-{{ category }}">{{ message }} </div>
     <div style="max-width: 400px; margin: 0 auto;">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }}" style="padding: 10px; margin-bottom: 10px; border-radius: 5px; background: {% if category == 'success' %}#d4edda{% elif category == 'error' %}#f8d7da{% else %}#d1ecf1{% endif %}; color: {% if category == 'success' %}#155724{% elif category == 'error' %}#721c24{% else %}#0c5460{% endif %};">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
         <div class="card">
             <h2 style="text-align: center; margin-bottom: 2rem; color: #333;">
                 <i class="fas fa-sign-in-alt"></i> Iniciar Sesión
@@ -35,7 +41,7 @@
             
             <div style="text-align: center; margin-top: 2rem;">
                 <p>¿No tienes una cuenta? 
-                    <a href="register.html" style="color: #667eea; text-decoration: none;">Regístrate aquí</a>
+                    <a href="{{ url_for('register') }}" style="color: #667eea; text-decoration: none;">Regístrate aquí</a>
                 </p>
             </div>
         </div>
