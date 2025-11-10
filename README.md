@@ -1,17 +1,19 @@
 # Tesina
 
-## fundamentación
-Este sitio web va ayudar a que las manicuristas gestionen sus citas de manera manual, lo que genera muchos inconvenientes como la sobrecarga de llamadas, y dificultades para ofrecer disponibilidad inmediata a los clientes. Esta situación afecta la eficiencia operativa del emprendimiento y la experiencia del cliente. a lo cual implementaremos una página web para la gestión de turnos que permitirá a los clientes reservar sus citas de manera autónoma y en cualquier momento desde su casa, mejorando su experiencia y satisfacción. Además, facilitará a la manicurista la organización de su agenda, reduciendo errores y optimizando el tiempo de trabajo. La digitalización de este proceso es esencial para mantenerse competitivo en el mercado actual.
+## Fundamentación
+Esta página nos ofrece una agenda para un salón de manicura. Esta funcionalidad está diseñada para que los usuarios puedan reservar turnos, visualizar la disponibilidad de horarios, seleccionar el servicio deseado y, si es necesario, reprogramar o cancelar sus turnos directamente desde esta página. Facilita el acceso a la información en tiempo real, permitiendo una mejor planificación tanto para las clientas como para el personal. Está pensada para ser clara y fácil de usar. No solo responde a una necesidad práctica de organización, sino que también es una herramienta estratégica para mejorar la calidad del servicio y la administración.
 
 
-## página de turnos y diseños para uñas 
 
 
-- Propósito: ayudar a agilizar los turnos y ver diseños para que sea más fácil a la manicura, y a la clienta 
+## Página de turnos y diseños para uñas 
 
-- Funcionalidad: elegir fecha y horario disponible mediante un calendario y reloj, cargar el diseño elegido y opcional el pago por anticipado 
 
-- habilidades y tecnología: Desarrollo web en html o css 
+- Propósito:  ofrecer una herramienta digital que permita a las clientas gestionar sus turnos de manera rápida, cómoda y sin demoras, mejor planificación tanto para las clientas como para el personal.
+
+- Funcionalidad: elegir fecha y horario mediante un calendario y reloj.
+
+- Habilidades y tecnología: Desarrollo web en html o css 
 
 - Alineación curricular: mejor comunicación y mejor organización para la manicura y la cliente, un sistema más rápido y ágil 
 
@@ -19,14 +21,12 @@ Este sitio web va ayudar a que las manicuristas gestionen sus citas de manera ma
 
 ## Rationale
 
-This website will help manicurists manage their appointments manually, which causes many inconveniences such as call overload and difficulties in offering immediate availability to clients. This situation affects the business's operational efficiency and customer experience. Therefore, we will implement an appointment management website that will allow clients to book their appointments independently and at any time from home, improving their experience and satisfaction. It will also make it easier for the manicurist to organize their schedule, reducing errors and optimizing work time. Digitizing this process is essential to remain competitive in today's market.
+This page offers a scheduling tool for a nail salon. This feature is designed so users can book appointments, view availability, select the desired service, and, if necessary, reschedule or cancel their appointments directly from this page. It facilitates access to real-time information, allowing for better planning for both clients and staff. It is designed to be clear and easy to use. It not only addresses a practical organizational need but is also a strategic tool for improving service quality and management.
 
-## nail appointment and design page
-
-- Purpose: To help streamline appointments and view designs to make it easier for the manicurist and the client.
-
+- Purpose: To offer a digital tool that allows customers to manage their appointments quickly, conveniently and without delays, improving planning for both customers and staff.
+  
 - Functionality: Select available dates and times using a calendar and clock, upload the chosen design, and optional prepayment.
-
+  
 - Skills and technology: Web development in HTML or CSS.
-
+  
 - Curriculum alignment: better communication and organization for the manicurist and the client, a faster and more streamlined system
