@@ -13,9 +13,9 @@ app = Flask(__name__)
 app.config['SECRET_KEY'] = 'b1f8e7c9-4a2e-4d8b-9f3c-2e7a6c1d8e5f' 
 app.config['MYSQL_HOST'] = 'localhost'
 app.config['MYSQL_USER'] = 'root'
-app.config['MYSQL_PASSWORD'] = 'test123456'
+app.config['MYSQL_PASSWORD'] = 'admin123'
 app.config['MYSQL_DB'] = 'agendanails'
-app.config['MYSQL_PORT'] = 3306
+app.config['MYSQL_PORT'] = 3307
 
 mysql = MySQL(app)
 
