@@ -157,3 +157,23 @@ if (window.location.pathname === '/admin') {
         // window.location.reload();
     }, 300000);
 } 
+
+fetch(`/cancelar_turno/${turnoId}`, {
+    method: "POST"
+})
+.then(response => response.json())
+.then(data => {
+    if (data.success) {
+        // Mostrar alerta ANTES de redirigir
+        alert(data.message);
+
+        // Redirigir a la página admin
+        window.location.href = data.redirect;
+    } else {
+        alert("Error al cancelar el turno.");
+    }
+})
+.catch(err => {
+    console.error(err);
+    alert("Error en la petición.");
+});

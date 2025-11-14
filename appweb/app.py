@@ -282,7 +282,12 @@ def cancelar_turno(turno_id):
     mysql.connection.commit()
     cur.close()
     
-    return jsonify({'success': True, 'message': 'Turno cancelado exitosamente'}), 200
+    return jsonify({
+        'success': True,
+        'message': 'Turno cancelado exitosamente',
+        'redirect': url_for('admin')
+    }), 200
+
 
 
 # -----------------------------
