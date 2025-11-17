@@ -163,31 +163,15 @@
     {% endif %}
   </div>
 
-  <script>
-    async function cancelarTurno(turnoId) {
-      if (!confirm('¿Estás seguro de que deseas cancelar este turno?')) {
-        return;
-      }
-
-      try {
-        const response = await fetch(`/cancelar_turno/${turnoId}`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          }
-        });
-
-        const data = await response.json();
-
-        if (data.success) {
-          alert('Turno cancelado exitosamente');
-          location.reload();
-        } else {
-          alert(data.message || 'Error al cancelar el turno');
-        }
-      } catch (error) {
-        console.error('Error:', error);
-        alert('Error de conexión. Por favor intenta nuevamente.');
+ <script>
+    function cancelarTurno(turnoId) {
+      if (confirm('¿Estás seguro de que deseas cancelar este turno?')) {
+        // Crear un formulario y enviarlo
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = `/cancelar_turno/${turnoId}`;
+        document.body.appendChild(form);
+        form.submit();
       }
     }
   </script>

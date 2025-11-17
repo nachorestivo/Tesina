@@ -264,7 +264,8 @@ def mis_turnos():
 def cancelar_turno(turno_id):
     """Cancela un turno"""
     if 'user_id' not in session:
-        return jsonify({'success': False, 'message': 'No autorizado'}), 401
+        flash('No autorizado', 'error')
+        return redirect(url_for('login'))
     
     cur = get_cursor(dictionary=True)
     cur.execute("SELECT id_Usuario FROM turnos WHERE id_Turnos = %s", (turno_id,))
@@ -272,21 +273,29 @@ def cancelar_turno(turno_id):
     
     if not turno:
         cur.close()
-        return jsonify({'success': False, 'message': 'Turno no encontrado'}), 404
+        flash('Turno no encontrado', 'error')
+        if session.get('is_admin'):
+            return redirect(url_for('admin'))
+        else:
+            return redirect(url_for('mis_turnos'))
     
     if turno['id_Usuario'] != session['user_id'] and not session.get('is_admin'):
         cur.close()
-        return jsonify({'success': False, 'message': 'No tienes permisos para cancelar este turno'}), 403
+        flash('No tienes permisos para cancelar este turno', 'error')
+        return redirect(url_for('mis_turnos'))
     
     cur.execute("UPDATE turnos SET Estado_del_turno = 'cancelado' WHERE id_Turnos = %s", (turno_id,))
     mysql.connection.commit()
     cur.close()
     
-    return jsonify({
-        'success': True,
-        'message': 'Turno cancelado exitosamente',
-        'redirect': url_for('admin')
-    }), 200
+    flash('Turno cancelado exitosamente', 'success')
+    
+    # Redirigir según el tipo de usuario
+    if session.get('is_admin'):
+        return redirect(url_for('/admin'))
+    else:
+        return redirect(url_for('/mis_turnos'))
+
 
 
 
